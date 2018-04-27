@@ -23,8 +23,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background-color: #444;
-            opacity: .2;
+            background-color: rgba(0, 0, 0, 0.67);
         }
         .iconfirm__container{
             position: relative;
@@ -93,6 +92,17 @@
             line-height: 50px;
             background: #eb5d5b;
         }
+
+
+
+
+        .iconfirm__wrap--sacle{
+            opacity: 0;
+            transform: scale(.5);
+        }
+        .modal__bg--hidden{
+            opacity: 0;
+        }
     </style>
 
     <title></title>
@@ -104,10 +114,10 @@
 
 <script id="iconfirm_template" type="text/x-handlebars-template">
     <div class="iconfirm">
-        <div class="iconfirm__bg"></div>
+        <div class="iconfirm__bg modal__bg--hidden"></div>
         <div class="iconfirm__container">
             <div class="iconfirm__cell">
-                <div class="iconfirm__wrap">
+                <div class="iconfirm__wrap iconfirm__wrap--sacle">
                     <div class="iconfirm__head">
                         <div class="iconfirm__close-icon">X</div>
                         <div class="iconfirm__slogan"></div>
@@ -135,10 +145,10 @@
 
     function Iconfirm(elem, options){
         var template = '<div class="iconfirm">' +
-                        '<div class="iconfirm__bg"></div>' +
+                        '<div class="iconfirm__bg modal__bg--hidden"></div>' +
                         '<div class="iconfirm__container">' +
                             '<div class="iconfirm__cell">' +
-                                '<div class="iconfirm__wrap">' +
+                                '<div class="iconfirm__wrap iconfirm__wrap--sacle">' +
                                     '<div class="iconfirm__head">' +
                                         '<div class="iconfirm__close-icon">X</div>' +
                                         '<div class="iconfirm__slogan"></div>' +
@@ -149,7 +159,6 @@
                                     '</div>' +
                                     '<div class="iconfirm__foot">' +
                                         '<div class="iconfirm__buttons">' +
-                                            '<button class="iconfirm__btn">确定</button>' +
                                         '</div>' +
                                     '</div>' +
                                 '</div>' +
@@ -159,21 +168,62 @@
 
 
         var defaults = {
+            title: '',
+            content: '',
             container: 'body',
-            animationSpeed: 400
+            animationSpeed: 400,
+
+            buttons: {
+                ok: {
+                    text: '确定',
+                    action: function(){}
+                },
+                cancel: {
+                    text: '取消',
+                    action: function(){
+
+                    }
+                }
+            }
         };
+
+
+        var putDefaultButtons = !(options['buttons'] === false);
+
+        if(!putDefaultButtons){
+            defaults['buttons'] = null;
+        }
 
         this.options = $.extend(true, {}, defaults, options);
 
         this.$template = $(template);
 
         this.init();
+
+
     }
 
     Iconfirm.prototype.init = function(){
         this.buildUI();
         this.bindEvent();
+
+        this.open();
     };
+
+    Iconfirm.prototype.open = function(){
+        this.$wrap.offset();
+        this.$wrap.removeClass('iconfirm__wrap--sacle');
+        this.$bg.removeClass('modal__bg--hidden');
+
+
+
+        setTimeout(function(){
+
+
+
+        }, this.options.animationSpeed);
+    };
+
 
     Iconfirm.prototype.buildUI = function(){
         var self = this;
@@ -182,17 +232,16 @@
         this.$bg      = $template.find('.iconfirm__bg');
         this.$slogan  = $template.find('.iconfirm__slogan');
         this.$title   = $template.find('.iconfirm__title');
-        this.$cell   = $template.find('.iconfirm__cell');
+        this.$cell    = $template.find('.iconfirm__cell');
         this.$content = $template.find('.iconfirm__content');
-        this.$title   = $template.find('.iconfirm__slogan');
+        this.$wrap    = $template.find('.iconfirm__wrap');
+        this.$slogan  = $template.find('.iconfirm__slogan');
         this.$buttons = $template.find('.iconfirm__buttons');
         this.$confirm = $template.appendTo(this.options.container);
-
 
         if(this.options.titleClass){
             this.$title.addClass(this.options.titleClass)
         }
-
 
         this.setStartingPosition();
 
@@ -208,7 +257,6 @@
             this.showLoading();
         }
 
-
         $.when(this.contentReady).then(function(){
             if(self.isAjaxLoading){
                 // 异步处理内容
@@ -219,7 +267,7 @@
 
         // 执行动画效果
         this.$bg.css(this.setAnimationCSS(this.options.animationSpeed, 1));
-        this.$cell.css(this.setAnimationCSS(this.options.animationSpeed, 1));
+        this.$wrap.css(this.setAnimationCSS(this.options.animationSpeed, 1));
     };
 
     Iconfirm.prototype.bindEvent = function(){
@@ -227,19 +275,79 @@
     };
 
     Iconfirm.prototype.setTitle = function(){
-
+        this.$title.html(this.options.title);
     };
 
     Iconfirm.prototype.setSlogan = function(){
 
+
+
     };
 
     Iconfirm.prototype.setContent = function(){
-
+        this.$content.html(this.options.content);
     };
     Iconfirm.prototype.setButtonts = function(){
+        var self = this;
 
+        var buttons = this.options.buttons;
+
+        var buttons_count = 0;
+        if(typeof buttons !== 'object'){
+            buttons = {};
+        }
+
+        $.each(buttons, function(key, button) {
+            buttons_count++;
+
+            // 包装用户传入的参数 如果不是预期的格式
+            if(typeof button === 'function'){
+                self.options.buttons[key] = button = {
+                    action: button
+                };
+            }
+
+            buttons[key].text = button.text || key;
+            buttons[key].btnClass = button.btnClass || 'btn-default';
+            // 如果用户没有传入action 这赋值一个空的函数来替代
+            buttons[key].action = button.action || function(){
+            };
+
+            buttons[key].keys = button.keys || [];
+            buttons[key].isHidden = button.isHidden || false;
+            buttons[key].isDisabled = button.isDisabled || false;
+
+            $.each(buttons[key].keys, function(i, a){
+                buttons[key].keys[i] = a.toLowerCase();
+            });
+
+            var button_element = $('<button type="button" class="btn"></button>')
+                .html(buttons[key].text)
+                .addClass(buttons[key].btnClass)
+                .prop('disabled', buttons[key].isDisabled)
+                .css('display', buttons[key].isHidden ? 'none' : '')
+                .click(function(e){
+                    e.preventDefault();
+                    // 执行传入的action函数 
+                    var res = buttons[key].action.apply(self, [buttons[key]]);
+
+                    if(typeof res === 'undefined' || res){
+                        self.close();
+                    }
+                });
+
+            self.$buttons.append(button_element);
+
+        });
+
+        if(buttons_count === 0) this.$buttons.hide();
     };
+
+
+    Iconfirm.prototype.close = function(){
+        lg('close');
+    };
+
     Iconfirm.prototype.setDraggable = function(){
 
     };
@@ -280,7 +388,18 @@
         });
     };
 
-    $('.btn').iconfirm();
+    $('.btn').iconfirm({
+        title: '我是标题',
+        content: '<div style="text-align: center;">我是内容</div>',
+        buttons: {
+            ok: {
+                text: '前去激活',
+                action: function(){
+                    console.log('action');
+                }
+            }
+        }
+    });
 
 </script>
 </body>
