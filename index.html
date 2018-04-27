@@ -210,19 +210,7 @@
         this.open();
     };
 
-    Iconfirm.prototype.open = function(){
-        this.$wrap.offset();
-        this.$wrap.removeClass('iconfirm__wrap--sacle');
-        this.$bg.removeClass('modal__bg--hidden');
 
-
-
-        setTimeout(function(){
-
-
-
-        }, this.options.animationSpeed);
-    };
 
 
     Iconfirm.prototype.buildUI = function(){
@@ -343,9 +331,31 @@
         if(buttons_count === 0) this.$buttons.hide();
     };
 
+    Iconfirm.prototype.open = function(){
+        this.$wrap.offset();
 
+        this.$wrap.removeClass('iconfirm__wrap--sacle');
+        this.$bg.removeClass('modal__bg--hidden');
+
+        setTimeout(function(){
+
+
+
+        }, this.options.animationSpeed);
+    };
     Iconfirm.prototype.close = function(){
-        lg('close');
+        var that = this;
+
+        this.$wrap.addClass('iconfirm__wrap--sacle');
+        this.$bg.addClass('modal__bg--hidden');
+
+        setTimeout(function(){
+
+            that.$confirm.remove();
+
+        }, that.options.animationSpeed);
+
+
     };
 
     Iconfirm.prototype.setDraggable = function(){
@@ -383,8 +393,12 @@
         $(this).each(function(index, item){
             if($(item).data('iconfirm')){ return; }
 
-            var instance = new Iconfirm(item, options);
-            $(item).data('iconfirm', instance);
+
+            $(item).on('click', function(){
+                var instance = new Iconfirm(item, options);
+                $(item).data('iconfirm', instance);
+            });
+
         });
     };
 
