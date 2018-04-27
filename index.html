@@ -143,7 +143,148 @@
 
     var lg = console.log;
 
-    function Iconfirm(elem, options){
+    var buildOptions = function (options, option2) {
+        if (typeof options === 'undefined') {
+            options = {};
+        }
+
+        if (typeof options === 'string') {
+            options = {
+                title: options,
+                content: (option2) ? option2 : false
+            };
+        }
+
+        return options;
+    };
+
+    var getObjectKeys = function(buttons){
+        if(typeof buttons !== 'object'){
+            return [];
+        }
+        
+        var arr = [];
+        $.each(buttons, function(){
+            arr.push(this);
+        });
+        
+        return arr;
+    };
+
+    var getObjectKeyOfIndex = function(obj, index){
+        var count = 0;
+        var key = null;
+        $.each(obj, function(_index, item){
+            if(count === index){
+                key = _index;
+
+                return false;
+            }
+            count++;
+        });
+        
+        return key;
+    };
+
+    var getTypeButton = function(options, type){
+        if(!options || !type){
+            return {};
+        }
+
+        switch(type){
+            case 'confirm':
+                var buttons = {};
+                var enableDefaultButtons = options['buttons'] !== false;
+
+                if (typeof options['buttons'] !== 'object') {
+                    buttons = {};
+                }
+                
+                var len = getObjectKeys(options['buttons']).length;
+                if(len === 0 && enableDefaultButtons){
+                    buttons = $.extend(true, {}, proxy.defaults.defaultButtons);
+                }
+
+                return buttons;
+            case 'alert':
+                var buttons = {};
+                var enableDefaultButtons = options['buttons'] !== false;
+
+                if (typeof options['buttons'] !== 'object') {
+                    buttons = {};
+                }
+
+                var len = getObjectKeys(options['buttons']).length;
+                if(len === 0 && enableDefaultButtons){
+                    var newButtons = $.extend(true, {}, proxy.defaults.defaultButtons);
+
+                    var first = getObjectKeyOfIndex(newButtons, 0);
+                    buttons[first] = newButtons[first];
+                }
+                return buttons;
+            case 'idialog':
+                return {};
+        }
+
+    };
+
+    $.iconfirm = function(options, options2){
+        options = buildOptions(options, options2);
+
+        options['buttons'] = getTypeButton(options, 'confirm');
+
+        proxy(options);    
+    };
+
+    $.ialert = function(options, options2){
+        options = buildOptions(options, options2);
+        
+        options['buttons'] = getTypeButton(options, 'alert');
+
+        proxy(options);    
+    };
+
+    $.idialog = function(options, options2){
+        options = buildOptions(options, options2);
+        
+        options['buttons'] = getTypeButton(options, 'idialog');
+
+        proxy(options);    
+    };
+
+    var proxy = function(options){
+        if (typeof options === 'undefined'){
+            options = {};
+        }
+
+        var pluginOptions = $.extend(true, {}, proxy.defaults, options);
+
+        
+        new Iconfirm(pluginOptions);
+    };
+
+    proxy.defaults = {
+        title: '',
+        content: '',
+        container: 'body',
+        animationSpeed: 400,
+        buttons: {
+
+        },
+        defaultButtons: {
+            ok: {
+                text: '确定',
+                action: function(){}
+            },
+            cancel: {
+                text: '取消',
+                action: function(){}
+            }
+        }
+    };
+
+
+    function Iconfirm(options){
         var template = '<div class="iconfirm">' +
                         '<div class="iconfirm__bg modal__bg--hidden"></div>' +
                         '<div class="iconfirm__container">' +
@@ -166,41 +307,11 @@
                         '</div>' +
                     '</div>';
 
-
-        var defaults = {
-            title: '',
-            content: '',
-            container: 'body',
-            animationSpeed: 400,
-
-            buttons: {
-                ok: {
-                    text: '确定',
-                    action: function(){}
-                },
-                cancel: {
-                    text: '取消',
-                    action: function(){
-
-                    }
-                }
-            }
-        };
-
-
-        var putDefaultButtons = !(options['buttons'] === false);
-
-        if(!putDefaultButtons){
-            defaults['buttons'] = null;
-        }
-
-        this.options = $.extend(true, {}, defaults, options);
-
+        this.options = options;                                         
         this.$template = $(template);
 
+
         this.init();
-
-
     }
 
     Iconfirm.prototype.init = function(){
@@ -210,13 +321,11 @@
         this.open();
     };
 
-
-
-
     Iconfirm.prototype.buildUI = function(){
         var self = this;
         var $template = this.$template;
-        
+
+
         this.$bg      = $template.find('.iconfirm__bg');
         this.$slogan  = $template.find('.iconfirm__slogan');
         this.$title   = $template.find('.iconfirm__title');
@@ -225,11 +334,14 @@
         this.$wrap    = $template.find('.iconfirm__wrap');
         this.$slogan  = $template.find('.iconfirm__slogan');
         this.$buttons = $template.find('.iconfirm__buttons');
+        this.$closeIcon = $template.find('.iconfirm__close-icon');
         this.$confirm = $template.appendTo(this.options.container);
 
         if(this.options.titleClass){
             this.$title.addClass(this.options.titleClass)
         }
+    
+
 
         this.setStartingPosition();
 
@@ -275,6 +387,7 @@
     Iconfirm.prototype.setContent = function(){
         this.$content.html(this.options.content);
     };
+
     Iconfirm.prototype.setButtonts = function(){
         var self = this;
 
@@ -329,6 +442,10 @@
         });
 
         if(buttons_count === 0) this.$buttons.hide();
+
+        self.$closeIcon.on('click', function(e){
+            self.close();
+        });
     };
 
     Iconfirm.prototype.open = function(){
@@ -339,10 +456,9 @@
 
         setTimeout(function(){
 
-
-
         }, this.options.animationSpeed);
     };
+    
     Iconfirm.prototype.close = function(){
         var that = this;
 
@@ -374,7 +490,7 @@
     };
 
     Iconfirm.prototype.setAnimationCSS = function(speed){
-        var bounce = 0;
+        var bounce = 1;
         var cubic_bezier = '0.36, 0.55, 0.19';
 
         return {
@@ -389,30 +505,41 @@
 
     };
 
-    $.prototype.iconfirm = function(options){
-        $(this).each(function(index, item){
-            if($(item).data('iconfirm')){ return; }
 
 
-            $(item).on('click', function(){
-                var instance = new Iconfirm(item, options);
-                $(item).data('iconfirm', instance);
+    $.prototype.iconfirm = function(options, options2){
+
+        if(typeof options === 'undefined'){
+            options = {};
+        }
+
+        if(typeof options === 'string'){
+            options = {
+                content: options,
+                title: options2 ? options2 : false
+            };
+        }
+  
+        $(this).each(function(){
+            var $this = $(this);
+            if($this.data('init')){ return; }
+
+            $this.on('click', function(){
+                $.iconfrim(options);
             });
 
+            $this.data('init', true);
         });
     };
 
-    $('.btn').iconfirm({
-        title: '我是标题',
-        content: '<div style="text-align: center;">我是内容</div>',
-        buttons: {
-            ok: {
-                text: '前去激活',
-                action: function(){
-                    console.log('action');
-                }
-            }
-        }
+    // $('.btn').iconfirm({
+    //     title: '我是标题',
+    //     content: '<div style="text-align: center;">我是内容</div>'
+    // });
+
+
+    $('.btn').on('click', function(e){
+        $.iconfirm('我是标题', '我是内容');
     });
 
 </script>
