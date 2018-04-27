@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="description" content="">
+    <meta name="keywords" content="">
+    
+    <style>
+        .iconfirm{
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+
+            overflow: auto;
+        }
+        .iconfirm__bg{
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #444;
+            opacity: .2;
+        }
+        .iconfirm__container{
+            position: relative;
+            display: table;
+            width: 100%;
+            height: 100%;
+        }
+        .iconfirm__cell{
+            padding: 40px 0;
+            display: table-cell;
+            vertical-align: middle;            
+        }
+        .iconfirm__wrap{
+            background: #fff;
+            border-radius: 2px;
+            width: 500px;
+            margin: auto;
+        }
+        .iconfirm__head{
+            position: relative;
+            padding: 30px 0 0 0;
+        }
+        .iconfirm__slogan{
+            text-align: center;
+        }
+        .iconfirm__slogan img{
+            display: block;
+            margin: auto;
+            max-width: 100%;
+        }
+        .iconfirm__title{
+            padding: 20px 20px 0 20px;
+            font-size: 16px;
+            font-weight: bold;
+            text-align: center;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .iconfirm__content{
+            min-height: 60px;
+        }
+        .iconfirm__close-icon{
+            cursor: pointer;
+            position: absolute;
+            right: 10px;
+            top: 10px;
+            width: 20px;
+            height: 20px;
+            line-height: 20px;
+            text-align: center;
+        }
+        .iconfirm__main{
+            padding: 20px;
+        }
+        .iconfirm__btn{
+            color: #fff;
+            outline: none;
+            cursor: pointer;
+            letter-spacing: .2em;
+            width: 100%;
+            border: 0;
+            font-size: 16px;
+            font-weight: bold;
+            padding: 0 10px;
+            line-height: 50px;
+            background: #eb5d5b;
+        }
+    </style>
+
+    <title></title>
+</head>
+<body>
+
+    <button class="btn">iconfirm</button>
+
+
+<script id="iconfirm_template" type="text/x-handlebars-template">
+    <div class="iconfirm">
+        <div class="iconfirm__bg"></div>
+        <div class="iconfirm__container">
+            <div class="iconfirm__cell">
+                <div class="iconfirm__wrap">
+                    <div class="iconfirm__head">
+                        <div class="iconfirm__close-icon">X</div>
+                        <div class="iconfirm__slogan"></div>
+                        <div class="iconfirm__title"></div>
+                    </div>
+                    <div class="iconfirm__main">
+                        <div class="iconfirm__content"></div>
+                    </div>
+                    <div class="iconfirm__foot">
+                        <div class="iconfirm__buttons">
+                            <button class="iconfirm__btn">确定</button>
+                        </div>
+                    </div>
+                </div>                
+            </div>
+        </div>
+    </div>
+</script>
+
+    
+<script src="https://cdn.bootcss.com/jquery/1.9.1/jquery.min.js"></script>
+<script>
+
+    var lg = console.log;
+
+    function Iconfirm(elem, options){
+        var template = '<div class="iconfirm">' +
+                        '<div class="iconfirm__bg"></div>' +
+                        '<div class="iconfirm__container">' +
+                            '<div class="iconfirm__cell">' +
+                                '<div class="iconfirm__wrap">' +
+                                    '<div class="iconfirm__head">' +
+                                        '<div class="iconfirm__close-icon">X</div>' +
+                                        '<div class="iconfirm__slogan"></div>' +
+                                        '<div class="iconfirm__title"></div>' +
+                                    '</div>' +
+                                    '<div class="iconfirm__main">' +
+                                        '<div class="iconfirm__content"></div>' +
+                                    '</div>' +
+                                    '<div class="iconfirm__foot">' +
+                                        '<div class="iconfirm__buttons">' +
+                                            '<button class="iconfirm__btn">确定</button>' +
+                                        '</div>' +
+                                    '</div>' +
+                                '</div>' +
+                            '</div>' +
+                        '</div>' +
+                    '</div>';
+
+
+        var defaults = {
+            container: 'body',
+            animationSpeed: 400
+        };
+
+        this.options = $.extend(true, {}, defaults, options);
+
+        this.$template = $(template);
+
+        this.init();
+    }
+
+    Iconfirm.prototype.init = function(){
+        this.buildUI();
+        this.bindEvent();
+    };
+
+    Iconfirm.prototype.buildUI = function(){
+        var self = this;
+        var $template = this.$template;
+        
+        this.$bg      = $template.find('.iconfirm__bg');
+        this.$slogan  = $template.find('.iconfirm__slogan');
+        this.$title   = $template.find('.iconfirm__title');
+        this.$cell   = $template.find('.iconfirm__cell');
+        this.$content = $template.find('.iconfirm__content');
+        this.$title   = $template.find('.iconfirm__slogan');
+        this.$buttons = $template.find('.iconfirm__buttons');
+        this.$confirm = $template.appendTo(this.options.container);
+
+
+        if(this.options.titleClass){
+            this.$title.addClass(this.options.titleClass)
+        }
+
+
+        this.setStartingPosition();
+
+        this.contentReady = $.Deferred();
+
+        this.setTitle();
+        this.setSlogan();
+        this.setContent();
+        this.setButtonts();
+        this.setDraggable();
+
+        if(this.options.isAjax){
+            this.showLoading();
+        }
+
+
+        $.when(this.contentReady).then(function(){
+            if(self.isAjaxLoading){
+                // 异步处理内容
+            }else{
+                // 同步处理内容
+            }
+        });
+
+        // 执行动画效果
+        this.$bg.css(this.setAnimationCSS(this.options.animationSpeed, 1));
+        this.$cell.css(this.setAnimationCSS(this.options.animationSpeed, 1));
+    };
+
+    Iconfirm.prototype.bindEvent = function(){
+
+    };
+
+    Iconfirm.prototype.setTitle = function(){
+
+    };
+
+    Iconfirm.prototype.setSlogan = function(){
+
+    };
+
+    Iconfirm.prototype.setContent = function(){
+
+    };
+    Iconfirm.prototype.setButtonts = function(){
+
+    };
+    Iconfirm.prototype.setDraggable = function(){
+
+    };
+    Iconfirm.prototype.setStartingPosition = function(){
+
+    };
+
+    Iconfirm.prototype.showLoading = function(){
+
+    };
+
+    Iconfirm.prototype.hideLoading = function(){
+
+    };
+
+    Iconfirm.prototype.setAnimationCSS = function(speed){
+        var bounce = 0;
+        var cubic_bezier = '0.36, 0.55, 0.19';
+
+        return {
+            '-webkit-transition-duration': speed / 1000 + 's',
+            'transition-duration': speed / 1000 + 's',
+            '-webkit-transition-timing-function': 'cubic-bezier(' + cubic_bezier + ', ' + bounce + ')',
+            'transition-timing-function': 'cubic-bezier(' + cubic_bezier + ', ' + bounce + ')'
+        };
+    };
+
+    Iconfirm.prototype.example = function(){
+
+    };
+
+    $.prototype.iconfirm = function(options){
+        $(this).each(function(index, item){
+            if($(item).data('iconfirm')){ return; }
+
+            var instance = new Iconfirm(item, options);
+            $(item).data('iconfirm', instance);
+        });
+    };
+
+    $('.btn').iconfirm();
+
+</script>
+</body>
+</html>
+        
