@@ -73,9 +73,8 @@
             right: 10px;
             top: 10px;
             width: 20px;
-            height: 20px;
-            font-size: 28px;
             line-height: 20px;
+            font-size: 24px;
             text-align: center;
             opacity: .6;
         }
@@ -103,10 +102,36 @@
             padding: 0;
             line-height: 50px;
             background: #eb5d5b;
+
+        }
+        @keyframes shake {
+            10%,
+            90% {
+                -webkit-transform: translate3d(-2px, 0, 0);
+                        transform: translate3d(-2px, 0, 0);
+            }
+            20%,
+            80% {
+                -webkit-transform: translate3d(4px, 0, 0);
+                        transform: translate3d(4px, 0, 0);
+            }
+            30%,
+            50%,
+            70% {
+                -webkit-transform: translate3d(-8px, 0, 0);
+                        transform: translate3d(-8px, 0, 0);
+            }
+            40%,
+            60% {
+                -webkit-transform: translate3d(8px, 0, 0);
+                        transform: translate3d(8px, 0, 0);
+            }
         }
 
-
-
+        .iconfirm__wrap.hilight-shake{
+            animation: shake 0.82s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+            transform: translate3d(0, 0, 0);
+        }
 
         .iconfirm__wrap--sacle{
             opacity: 0;
@@ -144,6 +169,7 @@
             .unbind-bank-card .input{
                 outline: none;
                 font-size: 16px;
+                width: 150px;
                 padding: 12px 10px;
                 border: 1px solid #eaeaea;
             }
@@ -172,20 +198,35 @@
                 line-height: 44px;
                 background: #eb5d5b;
             }
+            .unbind-bank-card__btn--loading{
+                background: #888;
+            }
+            .unbind-bank-card__btn--loading img{
+                display: inline;
+            }
             .unbind-bank-card__btn--getcode{
                 padding: 0 20px;
+            }
+            .unbind-bank-card__loading{
+                display: none;
+
+                vertical-align: middle;
+                width: 30px;
+                height: 30px;
             }
         </style>
         <div class="unbind-bank-card">
             <dl class="unbind-bank-card__box">
                 <dt>手机号：</dt>
-                <dd>186****8888</dd>
+                <dd><span id="J_bind_bank_card_phone">186****8888</span></dd>
             </dl>
             <dl class="unbind-bank-card__box">
                 <dt>验证码：</dt>
                 <dd> 
                     <input class="input" type="text" placeholder="请输入手机验证码">
-                    <button class="unbind-bank-card__btn unbind-bank-card__btn--getcode">获取验证码</button>
+                    <button class="unbind-bank-card__btn unbind-bank-card__btn--getcode">
+                        <img class="unbind-bank-card__loading" src="https://www.icaifu.com/images/p2p/loading.gif" alt="加载中">
+                        获取验证码</button>
                 </dd>
             </dl>
 
@@ -197,7 +238,9 @@
                 </dd>
             </dl>
             <div class="unbind-bank-card__btn-wrap">
-                <button id="J_submit_btn" class="unbind-bank-card__btn">确定</button>
+                <button id="J_submit_btn" class="unbind-bank-card__btn">
+                        <img class="unbind-bank-card__loading" src="https://www.icaifu.com/images/p2p/loading.gif" alt="加载中">
+                    确定</button>
             </div>
         </div>
     </script>
@@ -285,16 +328,19 @@
 
     // 解绑银行卡
     var unbind_bank_card = $('#J_unbind_bank_card_template').html();
-    $('.example-1').on('click', function(e){
+    // $('.example-1').on('click', function(e){
         $.idialog({
             title: '解绑银行卡',
             content: unbind_bank_card,
             onOpen: function(){
-                var val, that  = this;
+                var code, that  = this;
+                var $phone     = this.$content.find('#J_bind_bank_card_phone');
                 var $input     = this.$content.find('.input');
                 var $message   = this.$content.find('.unbind-bank-card__message');
                 var $getCode   = this.$content.find('.unbind-bank-card__btn--getcode');
                 var $submitBtn = this.$content.find('#J_submit_btn');
+                var $getCodeLoading = $getCode.find('.unbind-bank-card__loading');
+                var $submitBtnLoading = $submitBtn.find('.unbind-bank-card__loading');
 
                 $input.on('focus', function(){
                     $message.text('');
@@ -303,25 +349,82 @@
                 
                 // 获取验证码
                 $getCode.on('click', function(e){
-                    alert('获取验证码');
+                    var phone = $phone.text();
+
+
+                    var getCodePromise = $.Deferred();
+                    $.when(getCodePromise).then(function(data){
+                        $getCode.removeClass('unbind-bank-card__btn--loading');
+
+                        lg(data);
+                    });
+                    
+                    $getCode.addClass('unbind-bank-card__btn--loading');
+
+                    var getCode = function(phone, callback){
+                        setTimeout(function(){
+                            getCodePromise.resolve({
+                                type: 'success',
+                                code: 512652
+                            });
+                        }, 2000);
+                    };
+                    getCode(phone);
                 });
                 
                 // 提交手机号与验证码
                 $submitBtn.on('click', function(e){
-                    val = $.trim($input.val());
+                    code = $.trim($input.val());
+                    var phone = $phone.text();
 
-                    if(val){
-                        that.close();
-                        $.ialert('恭喜你，解绑成功');
+                    var submitPromise  = $.Deferred();
+                    $.when(submitPromise).then(function(data){
+                        $submitBtn.removeClass('unbind-bank-card__btn--loading');
+
+                        if(data.type === 'success'){
+                            that.close();
+                            $.ialert('恭喜你，解绑成功');
+                        }else{
+                            $.ialert('验证码错误');
+                        }
+
+                        lg(data);
+                    });
+
+
+                    var submitUnbindRequest = function(phone, code){
+                        var flag = Math.round(Math.random());
+                        
+                        if(flag){
+                            setTimeout(function(){
+                                submitPromise.resolve({
+                                    type: 'success',
+                                    msg: '解绑成功'
+                                });
+                            }, 2000);
+                        }else{
+                            setTimeout(function(){
+                                submitPromise.resolve({
+                                    type: 'error',
+                                    msg: '解绑失败'
+                                });
+                            }, 2000);
+                        }
+                    };
+
+                    if(phone && code){
+                        $submitBtn.addClass('unbind-bank-card__btn--loading');
+                        
+                        submitUnbindRequest(phone, code);
                     }else{
                         $input.css('border', '1px solid red');
-                        $message.text('密码错误');
+                        $message.text('验证码错误');
                     }
 
                 });
             }
         });
-    });
+    // });
 
     // 提现
     $('.example-2').on('click', function(e){
@@ -375,7 +478,8 @@
         $.idialog({
             width: 800,
             title: '提现说明',
-            content: withdraw_template
+            content: withdraw_template,
+            backgroundDismiss: true
         });
     });
 

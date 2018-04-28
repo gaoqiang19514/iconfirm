@@ -129,6 +129,7 @@ proxy.defaults = {
     container: 'body',
     animationSpeed: 400,
     slogan: false,
+    backgroundDismiss: false,
     buttons: {
 
     },
@@ -198,6 +199,7 @@ Iconfirm.prototype.buildUI = function(){
     this.$slogan  = $template.find('.iconfirm__slogan');
     this.$buttons = $template.find('.iconfirm__buttons');
     this.$closeIcon = $template.find('.iconfirm__close-icon');
+    this.$container = $template.find('.iconfirm__container');
     this.$confirm = $template.appendTo(this.options.container);
 
     this.contentReady = $.Deferred();
@@ -235,7 +237,34 @@ Iconfirm.prototype.buildUI = function(){
     this.$wrap.css(this.setAnimationCSS(this.options.animationSpeed, 1));
 };
 
+Iconfirm.prototype.shake = function(){
+    var that = this;
+
+    if(that._hilightAnimating){return;}
+
+    that.$wrap.addClass('hilight-shake');
+    this._hilightAnimating = true;
+    setTimeout(function () {
+        that._hilightAnimating = false;
+        that.$wrap.removeClass('hilight-shake');
+    }, 820);
+};
+
 Iconfirm.prototype.bindEvent = function(){
+    var that = this;
+
+    var $target;
+    that.$container.on('click', function(e){
+        $target = $(e.target);
+        if(!$target.closest('.iconfirm__wrap').length){
+            if(that.backgroundDismiss){
+                that.close();
+            }else{
+                that.shake();
+            }
+        }
+    });
+
 };
 
 Iconfirm.prototype.setTitle = function(){
