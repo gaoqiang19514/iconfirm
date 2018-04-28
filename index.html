@@ -14,7 +14,6 @@
             left: 0;
             right: 0;
             bottom: 0;
-
             overflow: auto;
         }
         .iconfirm__bg{
@@ -38,7 +37,6 @@
         }
         .iconfirm__wrap{
             background: #fff;
-            border-radius: 2px;
             width: 500px;
             margin: auto;
         }
@@ -66,6 +64,9 @@
         .iconfirm__content{
             min-height: 60px;
         }
+        .iconfirm__wrap{
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+        }
         .iconfirm__close-icon{
             cursor: pointer;
             position: absolute;
@@ -73,11 +74,22 @@
             top: 10px;
             width: 20px;
             height: 20px;
+            font-size: 28px;
             line-height: 20px;
             text-align: center;
+            opacity: .6;
+        }
+        .iconfirm__close-icon:hover{
+            opacity: 1;
         }
         .iconfirm__main{
             padding: 20px;
+        }
+        .iconfirm__buttons--multipe {
+            font-size: 0;
+        }
+        .iconfirm__buttons--multipe button{
+            width: 50%;
         }
         .iconfirm__btn{
             color: #fff;
@@ -88,7 +100,7 @@
             border: 0;
             font-size: 16px;
             font-weight: bold;
-            padding: 0 10px;
+            padding: 0;
             line-height: 50px;
             background: #eb5d5b;
         }
@@ -109,35 +121,19 @@
 </head>
 <body>
 
-    <button class="btn">iconfirm</button>
+    <button class="confirm">iconfirm</button>
+
+    <button class="alert">ialert</button>
+
+    <button class="alert--slogan">slogan ialert</button>
+
+    <button class="dialog">idialog</button>
+
+    <button class="dialog--confirm">confirm idialog</button>
 
 
-<script id="iconfirm_template" type="text/x-handlebars-template">
-    <div class="iconfirm">
-        <div class="iconfirm__bg modal__bg--hidden"></div>
-        <div class="iconfirm__container">
-            <div class="iconfirm__cell">
-                <div class="iconfirm__wrap iconfirm__wrap--sacle">
-                    <div class="iconfirm__head">
-                        <div class="iconfirm__close-icon">X</div>
-                        <div class="iconfirm__slogan"></div>
-                        <div class="iconfirm__title"></div>
-                    </div>
-                    <div class="iconfirm__main">
-                        <div class="iconfirm__content"></div>
-                    </div>
-                    <div class="iconfirm__foot">
-                        <div class="iconfirm__buttons">
-                            <button class="iconfirm__btn">确定</button>
-                        </div>
-                    </div>
-                </div>                
-            </div>
-        </div>
-    </div>
-</script>
 
-    
+
 <script src="https://cdn.bootcss.com/jquery/1.9.1/jquery.min.js"></script>
 <script>
 
@@ -151,7 +147,7 @@
         if (typeof options === 'string') {
             options = {
                 title: options,
-                content: (option2) ? option2 : false
+                content: option2 ? option2 : false
             };
         }
 
@@ -199,8 +195,8 @@
                 if (typeof options['buttons'] !== 'object') {
                     buttons = {};
                 }
-                
-                var len = getObjectKeys(options['buttons']).length;
+              
+                var len = getObjectKeys(buttons).length;
                 if(len === 0 && enableDefaultButtons){
                     buttons = $.extend(true, {}, proxy.defaults.defaultButtons);
                 }
@@ -214,7 +210,7 @@
                     buttons = {};
                 }
 
-                var len = getObjectKeys(options['buttons']).length;
+                var len = getObjectKeys(buttons).length;
                 if(len === 0 && enableDefaultButtons){
                     var newButtons = $.extend(true, {}, proxy.defaults.defaultButtons);
 
@@ -222,17 +218,18 @@
                     buttons[first] = newButtons[first];
                 }
                 return buttons;
-            case 'idialog':
+            case 'dialog':
                 return {};
         }
 
+        return {};
     };
 
     $.iconfirm = function(options, options2){
         options = buildOptions(options, options2);
 
         options['buttons'] = getTypeButton(options, 'confirm');
-
+    
         proxy(options);    
     };
 
@@ -256,9 +253,8 @@
         if (typeof options === 'undefined'){
             options = {};
         }
-
+    
         var pluginOptions = $.extend(true, {}, proxy.defaults, options);
-
         
         new Iconfirm(pluginOptions);
     };
@@ -268,6 +264,7 @@
         content: '',
         container: 'body',
         animationSpeed: 400,
+        slogan: false,
         buttons: {
 
         },
@@ -280,6 +277,9 @@
                 text: '取消',
                 action: function(){}
             }
+        },
+        onOpen: function(){
+
         }
     };
 
@@ -291,7 +291,7 @@
                             '<div class="iconfirm__cell">' +
                                 '<div class="iconfirm__wrap iconfirm__wrap--sacle">' +
                                     '<div class="iconfirm__head">' +
-                                        '<div class="iconfirm__close-icon">X</div>' +
+                                        '<div class="iconfirm__close-icon">×</div>' +
                                         '<div class="iconfirm__slogan"></div>' +
                                         '<div class="iconfirm__title"></div>' +
                                     '</div>' +
@@ -310,6 +310,7 @@
         this.options = options;                                         
         this.$template = $(template);
 
+        $.extend(this, options);
 
         this.init();
     }
@@ -317,14 +318,12 @@
     Iconfirm.prototype.init = function(){
         this.buildUI();
         this.bindEvent();
-
         this.open();
     };
 
     Iconfirm.prototype.buildUI = function(){
         var self = this;
         var $template = this.$template;
-
 
         this.$bg      = $template.find('.iconfirm__bg');
         this.$slogan  = $template.find('.iconfirm__slogan');
@@ -337,15 +336,13 @@
         this.$closeIcon = $template.find('.iconfirm__close-icon');
         this.$confirm = $template.appendTo(this.options.container);
 
+        this.contentReady = $.Deferred();
+
         if(this.options.titleClass){
             this.$title.addClass(this.options.titleClass)
         }
-    
-
 
         this.setStartingPosition();
-
-        this.contentReady = $.Deferred();
 
         this.setTitle();
         this.setSlogan();
@@ -371,7 +368,6 @@
     };
 
     Iconfirm.prototype.bindEvent = function(){
-
     };
 
     Iconfirm.prototype.setTitle = function(){
@@ -379,9 +375,8 @@
     };
 
     Iconfirm.prototype.setSlogan = function(){
-
-
-
+        if(!this.options.slogan){return;}
+        this.$slogan.html(this.options.slogan);
     };
 
     Iconfirm.prototype.setContent = function(){
@@ -422,7 +417,7 @@
                 buttons[key].keys[i] = a.toLowerCase();
             });
 
-            var button_element = $('<button type="button" class="btn"></button>')
+            var button_element = $('<button type="button" class="iconfirm__btn"></button>')
                 .html(buttons[key].text)
                 .addClass(buttons[key].btnClass)
                 .prop('disabled', buttons[key].isDisabled)
@@ -443,20 +438,28 @@
 
         if(buttons_count === 0) this.$buttons.hide();
 
+        if(buttons_count > 1){
+            self.$buttons.addClass('iconfirm__buttons--multipe');
+        }
+
         self.$closeIcon.on('click', function(e){
             self.close();
         });
     };
 
     Iconfirm.prototype.open = function(){
+        var that = this;
         this.$wrap.offset();
 
         this.$wrap.removeClass('iconfirm__wrap--sacle');
         this.$bg.removeClass('modal__bg--hidden');
 
         setTimeout(function(){
+            if(typeof that.onOpen === 'function'){
+                that.onOpen();
+            }
 
-        }, this.options.animationSpeed);
+        }, that.options.animationSpeed);
     };
     
     Iconfirm.prototype.close = function(){
@@ -470,23 +473,18 @@
             that.$confirm.remove();
 
         }, that.options.animationSpeed);
-
-
     };
 
     Iconfirm.prototype.setDraggable = function(){
-
     };
-    Iconfirm.prototype.setStartingPosition = function(){
 
+    Iconfirm.prototype.setStartingPosition = function(){
     };
 
     Iconfirm.prototype.showLoading = function(){
-
     };
 
     Iconfirm.prototype.hideLoading = function(){
-
     };
 
     Iconfirm.prototype.setAnimationCSS = function(speed){
@@ -505,10 +503,7 @@
 
     };
 
-
-
     $.prototype.iconfirm = function(options, options2){
-
         if(typeof options === 'undefined'){
             options = {};
         }
@@ -525,22 +520,63 @@
             if($this.data('init')){ return; }
 
             $this.on('click', function(){
-                $.iconfrim(options);
+                $.iconfirm(options);
             });
 
             $this.data('init', true);
         });
     };
 
-    // $('.btn').iconfirm({
-    //     title: '我是标题',
-    //     content: '<div style="text-align: center;">我是内容</div>'
-    // });
-
-
-    $('.btn').on('click', function(e){
+    $('.confirm').on('click', function(e){
         $.iconfirm('我是标题', '我是内容');
     });
+
+    $('.alert').on('click', function(e){
+        $.ialert('我是标题', '我是内容');
+    });
+
+    $('.alert--slogan').on('click', function(e){
+        $.ialert({
+            slogan: '<img src="./images/logo.png" alt="">',
+            title: '我是标题',
+            content: '我是内容'
+        });
+    });
+
+    $('.dialog').on('click', function(e){
+        $.idialog('我是标题', '我是内容');
+    });
+    
+    $('.dialog--confirm').on('click', function(e){
+        $.idialog({
+            content: '<div><input type="text"><button id="J_confirm">确定</button><div class="J_getcode">获取验证码</div><div class="error-message"></div></div>',
+            onOpen: function(){
+                var that = this;
+                var $input = this.$content.find('input');
+                var $message = this.$content.find('.error-message');
+                var $getCode = this.$content.find('.J_getcode');
+                var val;
+
+                $getCode.on('click', function(e){
+                    alert('获取验证码');
+                });
+
+                this.$content.find('button').on('click', function(e){
+                    val = $.trim($input.val());
+
+                    if(val){
+                        that.close();
+                        $.ialert('恭喜你，解绑成功');
+                    }else{
+                        $input.css('border', '1px solid red');
+                        $message.text('密码错误');
+                    }
+
+                });
+            }
+        });
+    });
+    
 
 </script>
 </body>
