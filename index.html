@@ -46,6 +46,7 @@
         }
         .iconfirm__slogan{
             text-align: center;
+            padding-bottom: 20px;
         }
         .iconfirm__slogan img{
             display: block;
@@ -53,7 +54,7 @@
             max-width: 100%;
         }
         .iconfirm__title{
-            padding: 0 20px 0 20px;
+            padding: 0 20px;
             font-size: 16px;
             font-weight: bold;
             text-align: center;
@@ -62,7 +63,6 @@
             white-space: nowrap;
         }
         .iconfirm__content{
-            min-height: 60px;
         }
         .iconfirm__wrap{
             box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
@@ -131,9 +131,6 @@
     <!-- 解绑银行卡 -->
     <script id="J_unbind_bank_card_template" type="text/x-handlebars-template">
         <style>
-            .unbind-bank-card{
-
-            }
             .unbind-bank-card__box{
                 margin: 0 0 10px 0;
             }
@@ -280,6 +277,8 @@
         </div>
     </script>
 
+    
+
 <script src="https://cdn.bootcss.com/jquery/1.9.1/jquery.min.js"></script>
 <script src="./js/jquery-iconfirm.js"></script>
 <script>
@@ -326,12 +325,12 @@
 
     // 提现
     $('.example-2').on('click', function(e){
-        $.idialog('提现', '提现单笔金额大于等于50万，提现时间工作日17:00到00:00不受理，您可以分拆提现金额或提现时间。');
+        $.idialog('提现', '<div style="color: #999; padding: 0 20px 20px 20px;">提现单笔金额大于等于50万，提现时间工作日17:00到00:00不受理，您可以分拆提现金额或提现时间。</div>');
     });
 
     // 您还未绑定银行卡
     $('.example-3').on('click', function(e){
-        $.ialert('提醒', '您还未绑定银行卡');
+        $.ialert('提醒', '<div style="padding: 20px 20px 20px 20px; font-size: 16px; font-weight: bold; text-align: center;">您还未绑定银行卡</div>');
     });
 
     // 激活存管账户
@@ -339,7 +338,7 @@
         $.ialert({
             slogan: '<img src="./images/logo.png" alt="">',
             title: '激活存管账户',
-            content: 'i财富携手上饶银行的资金存管系统已上线，为了保障您的资金安全，请开通上饶银行资金存管账户。',
+            content: '<div style="color: #999; padding: 0 20px 20px 20px;">i财富携手上饶银行的资金存管系统已上线，为了保障您的资金安全，请开通上饶银行资金存管账户。</div>',
             buttons: {
                 ok: {
                     text: '立即激活',
@@ -357,7 +356,7 @@
         $.ialert({
             slogan: '<img src="./images/logo.png" alt="">',
             title: '开通存管账户',
-            content: 'i财富携手上饶银行的资金存管系统已上线，为了保障您的资金安全，请开通上饶银行资金存管账户。',
+            content: '<div style="color: #999; padding: 0 20px 20px 20px;">i财富携手上饶银行的资金存管系统已上线，为了保障您的资金安全，请开通上饶银行资金存管账户。</div>',
             buttons: {
                 ok: {
                     text: '立即开通',

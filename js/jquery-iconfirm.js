@@ -243,7 +243,10 @@ Iconfirm.prototype.setTitle = function(){
 };
 
 Iconfirm.prototype.setSlogan = function(){
-    if(!this.options.slogan){return;}
+    if(!this.options.slogan){
+        this.$slogan.hide();
+        return;
+    }
     this.$slogan.html(this.options.slogan);
 };
 
