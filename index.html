@@ -53,7 +53,7 @@
             max-width: 100%;
         }
         .iconfirm__title{
-            padding: 20px 20px 0 20px;
+            padding: 0 20px 0 20px;
             font-size: 16px;
             font-weight: bold;
             text-align: center;
@@ -121,447 +121,194 @@
 </head>
 <body>
 
-    <button class="confirm">iconfirm</button>
+    <button class="example-1">解绑银行卡 1</button>
+    <button class="example-2">提现 2</button>
+    <button class="example-3">您还未绑定银行卡 3</button>
+    <button class="example-4">激活存管账户 4</button>
+    <button class="example-5">开通存管账户 5</button>
+    <button class="example-6">提现说明 6</button>
+    
+    <!-- 解绑银行卡 -->
+    <script id="J_unbind_bank_card_template" type="text/x-handlebars-template">
+        <style>
+            .unbind-bank-card{
 
-    <button class="alert">ialert</button>
+            }
+            .unbind-bank-card__box{
+                margin: 0 0 10px 0;
+            }
+            .unbind-bank-card__box dt{
+                float: left;
+            }
+            .unbind-bank-card__box dd{
+                margin-left: 80px;
+            }
 
-    <button class="alert--slogan">slogan ialert</button>
+            .unbind-bank-card .input{
+                outline: none;
+                font-size: 16px;
+                padding: 12px 10px;
+                border: 1px solid #eaeaea;
+            }
+            .unbind-bank-card__message{
+                font-size: 14px;
+                line-height: 2;
+                color: #eb5d5b; 
+            }
+            .unbind-bank-card__tips{
+                font-size: 14px;
+                color: #888;
+                margin: .5em 0 1em 0;
+            }
+            .unbind-bank-card__btn-wrap{
+                text-align: center;
+            }
+            .unbind-bank-card__btn{
+                cursor: pointer;
+                padding: 0 80px;
+                border: 0;
+                color: #fff;
+                font-size: 16px;
+                letter-spacing: .2em;
+                font-weight: bold;
+                outline: none;
+                line-height: 44px;
+                background: #eb5d5b;
+            }
+            .unbind-bank-card__btn--getcode{
+                padding: 0 20px;
+            }
+        </style>
+        <div class="unbind-bank-card">
+            <dl class="unbind-bank-card__box">
+                <dt>手机号：</dt>
+                <dd>186****8888</dd>
+            </dl>
+            <dl class="unbind-bank-card__box">
+                <dt>验证码：</dt>
+                <dd> 
+                    <input class="input" type="text" placeholder="请输入手机验证码">
+                    <button class="unbind-bank-card__btn unbind-bank-card__btn--getcode">获取验证码</button>
+                </dd>
+            </dl>
 
-    <button class="dialog">idialog</button>
+            <dl class="unbind-bank-card__box">
+                <dt></dt>
+                <dd>
+                    <div class="unbind-bank-card__message"></div>
+                    <div class="unbind-bank-card__tips">解绑后，您的i财富账户将不能充值、提现。</div>
+                </dd>
+            </dl>
+            <div class="unbind-bank-card__btn-wrap">
+                <button id="J_submit_btn" class="unbind-bank-card__btn">确定</button>
+            </div>
+        </div>
+    </script>
 
-    <button class="dialog--confirm">confirm idialog</button>
-
-
-
+    <!-- 提现说明 -->
+    <script id="J_withdraw_template" type="text/x-handlebars-template">
+        <style>
+            .withdraw-explain{
+                color: #333;
+                font-size: 14px;
+                line-height: 1.7;
+            }
+            .withdraw-explain ol{
+                margin: 0;
+                padding: 0 0 0 1.5em;
+            }
+            .withdraw-explain table{
+                border-collapse: collapse;
+                width: 100%;
+                margin: 10px 0;
+            }
+            .withdraw-explain th,
+            .withdraw-explain td{
+                padding: 10px;
+                vertical-align: middle;
+                border: 1px solid #898996;
+            }
+        </style>
+        <div class="withdraw-explain">
+            <ol>
+                <li>提现费用为********，不足************</li>
+                <li>单笔提现最低10元起。</li>
+                <li>
+                    提现金额和到账时间参考，具体到账时间以银行实际收款时间而定。
+                    <table>
+                        <tr>
+                            <th>单笔金额</th>
+                            <th>处理时间</th>
+                            <th>到账时间</th>
+                        </tr>
+                        <tr>
+                            <td>小于等于5万</td>
+                            <td>7×24 小时</td>
+                            <td>两小时内</td>
+                        </tr>
+                        <tr>
+                            <td rowspan="3">大于5万小于50万</td>
+                            <td>工作日00:10 到17:00</td>
+                            <td>实时到账</td>
+                        </tr>
+                        <tr>
+                            <td>工作日17:00 到00:00</td>
+                            <td>不受理</td>
+                        </tr>
+                        <tr>
+                            <td>双休日及法定节假日</td>
+                            <td>两小时内</td>
+                        </tr>
+                        <tr>
+                            <td rowspan="3">大于等于50万</td>
+                            <td>工作日00:10 到17:00</td>
+                            <td>实时到账</td>
+                        </tr>
+                        <tr>
+                            <td>工作日17:00 到00:00</td>
+                            <td>不受理</td>
+                        </tr>
+                        <tr>
+                            <td>双休日及法定节假日</td>
+                            <td>不受理</td>
+                        </tr>                
+                    </table>
+                </li>
+                <li>当月有投资或回款到期的用户可享受3次免费提现福利。</li>
+                <li>提现失败，这笔资金将被冻结，两个工作日左右人工处理，解冻资金，需用户再次发起提现。</li>
+            </ol>
+        </div>
+    </script>
 
 <script src="https://cdn.bootcss.com/jquery/1.9.1/jquery.min.js"></script>
+<script src="./js/jquery-iconfirm.js"></script>
 <script>
 
-    var lg = console.log;
-
-    var buildOptions = function (options, option2) {
-        if (typeof options === 'undefined') {
-            options = {};
-        }
-
-        if (typeof options === 'string') {
-            options = {
-                title: options,
-                content: option2 ? option2 : false
-            };
-        }
-
-        return options;
-    };
-
-    var getObjectKeys = function(buttons){
-        if(typeof buttons !== 'object'){
-            return [];
-        }
-        
-        var arr = [];
-        $.each(buttons, function(){
-            arr.push(this);
-        });
-        
-        return arr;
-    };
-
-    var getObjectKeyOfIndex = function(obj, index){
-        var count = 0;
-        var key = null;
-        $.each(obj, function(_index, item){
-            if(count === index){
-                key = _index;
-
-                return false;
-            }
-            count++;
-        });
-        
-        return key;
-    };
-
-    var getTypeButton = function(options, type){
-        if(!options || !type){
-            return {};
-        }
-
-        switch(type){
-            case 'confirm':
-                var buttons = {};
-                var enableDefaultButtons = options['buttons'] !== false;
-
-                if (typeof options['buttons'] !== 'object') {
-                    buttons = {};
-                }
-              
-                var len = getObjectKeys(buttons).length;
-                if(len === 0 && enableDefaultButtons){
-                    buttons = $.extend(true, {}, proxy.defaults.defaultButtons);
-                }
-
-                return buttons;
-            case 'alert':
-                var buttons = {};
-                var enableDefaultButtons = options['buttons'] !== false;
-
-                if (typeof options['buttons'] !== 'object') {
-                    buttons = {};
-                }
-
-                var len = getObjectKeys(buttons).length;
-                if(len === 0 && enableDefaultButtons){
-                    var newButtons = $.extend(true, {}, proxy.defaults.defaultButtons);
-
-                    var first = getObjectKeyOfIndex(newButtons, 0);
-                    buttons[first] = newButtons[first];
-                }
-                return buttons;
-            case 'dialog':
-                return {};
-        }
-
-        return {};
-    };
-
-    $.iconfirm = function(options, options2){
-        options = buildOptions(options, options2);
-
-        options['buttons'] = getTypeButton(options, 'confirm');
-    
-        proxy(options);    
-    };
-
-    $.ialert = function(options, options2){
-        options = buildOptions(options, options2);
-        
-        options['buttons'] = getTypeButton(options, 'alert');
-
-        proxy(options);    
-    };
-
-    $.idialog = function(options, options2){
-        options = buildOptions(options, options2);
-        
-        options['buttons'] = getTypeButton(options, 'idialog');
-
-        proxy(options);    
-    };
-
-    var proxy = function(options){
-        if (typeof options === 'undefined'){
-            options = {};
-        }
-    
-        var pluginOptions = $.extend(true, {}, proxy.defaults, options);
-        
-        new Iconfirm(pluginOptions);
-    };
-
-    proxy.defaults = {
-        title: '',
-        content: '',
-        container: 'body',
-        animationSpeed: 400,
-        slogan: false,
-        buttons: {
-
-        },
-        defaultButtons: {
-            ok: {
-                text: '确定',
-                action: function(){}
-            },
-            cancel: {
-                text: '取消',
-                action: function(){}
-            }
-        },
-        onOpen: function(){
-
-        }
-    };
-
-
-    function Iconfirm(options){
-        var template = '<div class="iconfirm">' +
-                        '<div class="iconfirm__bg modal__bg--hidden"></div>' +
-                        '<div class="iconfirm__container">' +
-                            '<div class="iconfirm__cell">' +
-                                '<div class="iconfirm__wrap iconfirm__wrap--sacle">' +
-                                    '<div class="iconfirm__head">' +
-                                        '<div class="iconfirm__close-icon">×</div>' +
-                                        '<div class="iconfirm__slogan"></div>' +
-                                        '<div class="iconfirm__title"></div>' +
-                                    '</div>' +
-                                    '<div class="iconfirm__main">' +
-                                        '<div class="iconfirm__content"></div>' +
-                                    '</div>' +
-                                    '<div class="iconfirm__foot">' +
-                                        '<div class="iconfirm__buttons">' +
-                                        '</div>' +
-                                    '</div>' +
-                                '</div>' +
-                            '</div>' +
-                        '</div>' +
-                    '</div>';
-
-        this.options = options;                                         
-        this.$template = $(template);
-
-        $.extend(this, options);
-
-        this.init();
-    }
-
-    Iconfirm.prototype.init = function(){
-        this.buildUI();
-        this.bindEvent();
-        this.open();
-    };
-
-    Iconfirm.prototype.buildUI = function(){
-        var self = this;
-        var $template = this.$template;
-
-        this.$bg      = $template.find('.iconfirm__bg');
-        this.$slogan  = $template.find('.iconfirm__slogan');
-        this.$title   = $template.find('.iconfirm__title');
-        this.$cell    = $template.find('.iconfirm__cell');
-        this.$content = $template.find('.iconfirm__content');
-        this.$wrap    = $template.find('.iconfirm__wrap');
-        this.$slogan  = $template.find('.iconfirm__slogan');
-        this.$buttons = $template.find('.iconfirm__buttons');
-        this.$closeIcon = $template.find('.iconfirm__close-icon');
-        this.$confirm = $template.appendTo(this.options.container);
-
-        this.contentReady = $.Deferred();
-
-        if(this.options.titleClass){
-            this.$title.addClass(this.options.titleClass)
-        }
-
-        this.setStartingPosition();
-
-        this.setTitle();
-        this.setSlogan();
-        this.setContent();
-        this.setButtonts();
-        this.setDraggable();
-
-        if(this.options.isAjax){
-            this.showLoading();
-        }
-
-        $.when(this.contentReady).then(function(){
-            if(self.isAjaxLoading){
-                // 异步处理内容
-            }else{
-                // 同步处理内容
-            }
-        });
-
-        // 执行动画效果
-        this.$bg.css(this.setAnimationCSS(this.options.animationSpeed, 1));
-        this.$wrap.css(this.setAnimationCSS(this.options.animationSpeed, 1));
-    };
-
-    Iconfirm.prototype.bindEvent = function(){
-    };
-
-    Iconfirm.prototype.setTitle = function(){
-        this.$title.html(this.options.title);
-    };
-
-    Iconfirm.prototype.setSlogan = function(){
-        if(!this.options.slogan){return;}
-        this.$slogan.html(this.options.slogan);
-    };
-
-    Iconfirm.prototype.setContent = function(){
-        this.$content.html(this.options.content);
-    };
-
-    Iconfirm.prototype.setButtonts = function(){
-        var self = this;
-
-        var buttons = this.options.buttons;
-
-        var buttons_count = 0;
-        if(typeof buttons !== 'object'){
-            buttons = {};
-        }
-
-        $.each(buttons, function(key, button) {
-            buttons_count++;
-
-            // 包装用户传入的参数 如果不是预期的格式
-            if(typeof button === 'function'){
-                self.options.buttons[key] = button = {
-                    action: button
-                };
-            }
-
-            buttons[key].text = button.text || key;
-            buttons[key].btnClass = button.btnClass || 'btn-default';
-            // 如果用户没有传入action 这赋值一个空的函数来替代
-            buttons[key].action = button.action || function(){
-            };
-
-            buttons[key].keys = button.keys || [];
-            buttons[key].isHidden = button.isHidden || false;
-            buttons[key].isDisabled = button.isDisabled || false;
-
-            $.each(buttons[key].keys, function(i, a){
-                buttons[key].keys[i] = a.toLowerCase();
-            });
-
-            var button_element = $('<button type="button" class="iconfirm__btn"></button>')
-                .html(buttons[key].text)
-                .addClass(buttons[key].btnClass)
-                .prop('disabled', buttons[key].isDisabled)
-                .css('display', buttons[key].isHidden ? 'none' : '')
-                .click(function(e){
-                    e.preventDefault();
-                    // 执行传入的action函数 
-                    var res = buttons[key].action.apply(self, [buttons[key]]);
-
-                    if(typeof res === 'undefined' || res){
-                        self.close();
-                    }
-                });
-
-            self.$buttons.append(button_element);
-
-        });
-
-        if(buttons_count === 0) this.$buttons.hide();
-
-        if(buttons_count > 1){
-            self.$buttons.addClass('iconfirm__buttons--multipe');
-        }
-
-        self.$closeIcon.on('click', function(e){
-            self.close();
-        });
-    };
-
-    Iconfirm.prototype.open = function(){
-        var that = this;
-        this.$wrap.offset();
-
-        this.$wrap.removeClass('iconfirm__wrap--sacle');
-        this.$bg.removeClass('modal__bg--hidden');
-
-        setTimeout(function(){
-            if(typeof that.onOpen === 'function'){
-                that.onOpen();
-            }
-
-        }, that.options.animationSpeed);
-    };
-    
-    Iconfirm.prototype.close = function(){
-        var that = this;
-
-        this.$wrap.addClass('iconfirm__wrap--sacle');
-        this.$bg.addClass('modal__bg--hidden');
-
-        setTimeout(function(){
-
-            that.$confirm.remove();
-
-        }, that.options.animationSpeed);
-    };
-
-    Iconfirm.prototype.setDraggable = function(){
-    };
-
-    Iconfirm.prototype.setStartingPosition = function(){
-    };
-
-    Iconfirm.prototype.showLoading = function(){
-    };
-
-    Iconfirm.prototype.hideLoading = function(){
-    };
-
-    Iconfirm.prototype.setAnimationCSS = function(speed){
-        var bounce = 1;
-        var cubic_bezier = '0.36, 0.55, 0.19';
-
-        return {
-            '-webkit-transition-duration': speed / 1000 + 's',
-            'transition-duration': speed / 1000 + 's',
-            '-webkit-transition-timing-function': 'cubic-bezier(' + cubic_bezier + ', ' + bounce + ')',
-            'transition-timing-function': 'cubic-bezier(' + cubic_bezier + ', ' + bounce + ')'
-        };
-    };
-
-    Iconfirm.prototype.example = function(){
-
-    };
-
-    $.prototype.iconfirm = function(options, options2){
-        if(typeof options === 'undefined'){
-            options = {};
-        }
-
-        if(typeof options === 'string'){
-            options = {
-                content: options,
-                title: options2 ? options2 : false
-            };
-        }
-  
-        $(this).each(function(){
-            var $this = $(this);
-            if($this.data('init')){ return; }
-
-            $this.on('click', function(){
-                $.iconfirm(options);
-            });
-
-            $this.data('init', true);
-        });
-    };
-
-    $('.confirm').on('click', function(e){
-        $.iconfirm('我是标题', '我是内容');
-    });
-
-    $('.alert').on('click', function(e){
-        $.ialert('我是标题', '我是内容');
-    });
-
-    $('.alert--slogan').on('click', function(e){
-        $.ialert({
-            slogan: '<img src="./images/logo.png" alt="">',
-            title: '我是标题',
-            content: '我是内容'
-        });
-    });
-
-    $('.dialog').on('click', function(e){
-        $.idialog('我是标题', '我是内容');
-    });
-    
-    $('.dialog--confirm').on('click', function(e){
+    // 解绑银行卡
+    var unbind_bank_card = $('#J_unbind_bank_card_template').html();
+    // $('.example-1').on('click', function(e){
         $.idialog({
-            content: '<div><input type="text"><button id="J_confirm">确定</button><div class="J_getcode">获取验证码</div><div class="error-message"></div></div>',
+            title: '解绑银行卡',
+            content: unbind_bank_card,
             onOpen: function(){
-                var that = this;
-                var $input = this.$content.find('input');
-                var $message = this.$content.find('.error-message');
-                var $getCode = this.$content.find('.J_getcode');
-                var val;
+                var val, that  = this;
+                var $input     = this.$content.find('.input');
+                var $message   = this.$content.find('.unbind-bank-card__message');
+                var $getCode   = this.$content.find('.unbind-bank-card__btn--getcode');
+                var $submitBtn = this.$content.find('#J_submit_btn');
 
+                $input.on('focus', function(){
+                    $message.text('');
+                    $input.css('border', '');
+                });
+                
+                // 获取验证码
                 $getCode.on('click', function(e){
                     alert('获取验证码');
                 });
-
-                this.$content.find('button').on('click', function(e){
+                
+                // 提交手机号与验证码
+                $submitBtn.on('click', function(e){
                     val = $.trim($input.val());
 
                     if(val){
@@ -575,8 +322,63 @@
                 });
             }
         });
+    // });
+
+    // 提现
+    $('.example-2').on('click', function(e){
+        $.idialog('提现', '提现单笔金额大于等于50万，提现时间工作日17:00到00:00不受理，您可以分拆提现金额或提现时间。');
     });
-    
+
+    // 您还未绑定银行卡
+    $('.example-3').on('click', function(e){
+        $.ialert('提醒', '您还未绑定银行卡');
+    });
+
+    // 激活存管账户
+    $('.example-4').on('click', function(e){
+        $.ialert({
+            slogan: '<img src="./images/logo.png" alt="">',
+            title: '激活存管账户',
+            content: 'i财富携手上饶银行的资金存管系统已上线，为了保障您的资金安全，请开通上饶银行资金存管账户。',
+            buttons: {
+                ok: {
+                    text: '立即激活',
+                    action: function(){
+                        window.location.href = 'https://www.baidu.com';
+                        return false;
+                    }
+                }
+            }
+        });
+    });
+
+    // 开通存管账户
+    $('.example-5').on('click', function(e){
+        $.ialert({
+            slogan: '<img src="./images/logo.png" alt="">',
+            title: '开通存管账户',
+            content: 'i财富携手上饶银行的资金存管系统已上线，为了保障您的资金安全，请开通上饶银行资金存管账户。',
+            buttons: {
+                ok: {
+                    text: '立即开通',
+                    action: function(){
+                        window.location.href = 'https://www.baidu.com';
+                        return false;
+                    }
+                }
+            }
+        });
+    });
+
+    // 提现说明
+    var withdraw_template = $('#J_withdraw_template').html();
+    $('.example-6').on('click', function(e){
+        $.idialog({
+            width: 800,
+            title: '提现说明',
+            content: withdraw_template
+        });
+    });
 
 </script>
 </body>
