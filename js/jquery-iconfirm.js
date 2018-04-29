@@ -130,7 +130,7 @@ proxy.defaults = {
     animationSpeed: 400,
     slogan: false,
     backgroundDismiss: false,
-    gap: 10,
+    dragWindowGap: 20,
     buttons: {
 
     },
@@ -460,16 +460,16 @@ Iconfirm.prototype.setStartingPosition = function () {
 Iconfirm.prototype.setDrag = function () {
     var $box = this.$wrap, $container = this.$container, $window = $(window);
 
+    // dragWindowGap
 
-
-    var winW = $window.width();
-    var winH = $window.height();
-    var boxW = $box.width();
-    var boxH = $box.height();
+    var winW       = $window.width();
+    var winH       = $window.height();
+    var boxW       = $box.width();
+    var boxH       = $box.height();
     var containerH = $container.height()
 
-    var minLeft = (winW - boxW) / 2;
-    var minTop = (winH - boxH) / 2;
+    var minLeft = (winW - boxW) / 2 - this.dragWindowGap;
+    var minTop  = (winH - boxH) / 2 - this.dragWindowGap;
     var scrollTop = (containerH - winH) / 2;
 
     if(this.currentPos.x + minLeft < 0){
