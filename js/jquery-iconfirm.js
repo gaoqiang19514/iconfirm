@@ -213,6 +213,8 @@ Iconfirm.prototype.buildUI = function () {
     this.$moveContainer = $template.find('.iconfirm__move-container');
     this.$confirm       = $template.appendTo(this.options.container);
 
+
+    
     this.contentReady = $.Deferred();
 
     if (this.options.titleClass) {
@@ -231,6 +233,7 @@ Iconfirm.prototype.buildUI = function () {
     this.setButtonts();
     this.setDraggable();
 
+
     if (this.options.isAjax) {
         this.showLoading();
     }
@@ -247,6 +250,16 @@ Iconfirm.prototype.buildUI = function () {
     this.$bg.css(this.setAnimationCSS(this.options.animationSpeed, 1));
     this.$wrap.css(this.setAnimationCSS(this.options.animationSpeed, 1));
     this.$cell.css(this.setAnimationCSS(this.options.animationSpeed, 1));
+};
+
+Iconfirm.prototype.measureScrollbarWidth = function(){
+    var $div = $('<div style="width: 100px; height: 100px; outline: 1px solid red; overflow: scroll;"><div></div></div>');
+    $('body').append($div);
+    var divW = $div.width();
+    var divInnerW = $div.find('div').width();
+
+    $div.remove();
+    return divW - divInnerW;
 };
 
 Iconfirm.prototype.scrollTop = function(){
@@ -415,10 +428,25 @@ Iconfirm.prototype.open = function () {
 
     this.$cell.css('transform', 'translate(' + 0 + 'px, ' + 0 + 'px)');
 
+
+    var winH = $(window).height();
+
+    var containerH = that.$container.height()
+
+    // 如果容器高度大于window，说明出现了滚动条 所以给bg的right减去获取的滚动条宽度
+    if(containerH - winH){
+        var scrollbarW = this.measureScrollbarWidth();
+
+        this.$bg.css("right", scrollbarW);
+    }
+
+
     setTimeout(function () {
         if (typeof that.onOpen === 'function') {
             that.onOpen();
         }
+
+
     }, that.options.animationSpeed);
 };
 
