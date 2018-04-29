@@ -199,7 +199,8 @@
                 background: #eb5d5b;
             }
             .unbind-bank-card__btn--loading{
-                background: #888;
+                cursor: default;
+                background: #ccc;
             }
             .unbind-bank-card__btn--loading img{
                 display: inline;
@@ -333,33 +334,34 @@
             title: '解绑银行卡',
             content: unbind_bank_card,
             onOpen: function(){
-                var code, that  = this;
-                var $phone     = this.$content.find('#J_bind_bank_card_phone');
-                var $input     = this.$content.find('.input');
-                var $message   = this.$content.find('.unbind-bank-card__message');
-                var $getCode   = this.$content.find('.unbind-bank-card__btn--getcode');
-                var $submitBtn = this.$content.find('#J_submit_btn');
-                var $getCodeLoading = $getCode.find('.unbind-bank-card__loading');
+                var that              = this;
+                var $phone            = this.$content.find('#J_bind_bank_card_phone');
+                var $input            = this.$content.find('.input');
+                var $message          = this.$content.find('.unbind-bank-card__message');
+                var $getCode          = this.$content.find('.unbind-bank-card__btn--getcode');
+                var $submitBtn        = this.$content.find('#J_submit_btn');
+                var $getCodeLoading   = $getCode.find('.unbind-bank-card__loading');
                 var $submitBtnLoading = $submitBtn.find('.unbind-bank-card__loading');
 
                 $input.on('focus', function(){
                     $message.text('');
                     $input.css('border', '');
                 });
+
+                // ----------------------------------------------------------------------------------------
                 
                 // 获取验证码
                 $getCode.on('click', function(e){
-                    var phone = $phone.text();
+                    if($(this).attr('disable')){return;}
 
+                    var phone = $phone.text();
 
                     var getCodePromise = $.Deferred();
                     $.when(getCodePromise).then(function(data){
-                        $getCode.removeClass('unbind-bank-card__btn--loading');
-
-                        lg(data);
+                        console.log(data);
+                    }).always(function(data){
+                        $getCode.removeClass('unbind-bank-card__btn--loading').attr('disable', '');
                     });
-                    
-                    $getCode.addClass('unbind-bank-card__btn--loading');
 
                     var getCode = function(phone, callback){
                         setTimeout(function(){
@@ -369,28 +371,32 @@
                             });
                         }, 2000);
                     };
+
+                    $getCode.addClass('unbind-bank-card__btn--loading').attr('disable', 'disable');
                     getCode(phone);
                 });
+
+                // ----------------------------------------------------------------------------------------
                 
                 // 提交手机号与验证码
                 $submitBtn.on('click', function(e){
-                    code = $.trim($input.val());
+                    if($(this).attr('disable')){return;}
+
                     var phone = $phone.text();
+                    var code  = $.trim($input.val());
 
-                    var submitPromise  = $.Deferred();
+                    var submitPromise = $.Deferred();
                     $.when(submitPromise).then(function(data){
-                        $submitBtn.removeClass('unbind-bank-card__btn--loading');
-
                         if(data.type === 'success'){
-                            that.close();
+                            lg(data);
+                            // that.close();
                             $.ialert('恭喜你，解绑成功');
                         }else{
                             $.ialert('验证码错误');
                         }
-
-                        lg(data);
+                    }).always(function(data){
+                        $submitBtn.removeClass('unbind-bank-card__btn--loading').attr('disable', '');
                     });
-
 
                     var submitUnbindRequest = function(phone, code){
                         var flag = Math.round(Math.random());
@@ -413,14 +419,11 @@
                     };
 
                     if(phone && code){
-                        $submitBtn.addClass('unbind-bank-card__btn--loading');
-                        
+                        $submitBtn.addClass('unbind-bank-card__btn--loading').attr('disable', 'disable');;
                         submitUnbindRequest(phone, code);
                     }else{
-                        $input.css('border', '1px solid red');
-                        $message.text('验证码错误');
+                        $.ialert('验证码错误');
                     }
-
                 });
             }
         });
