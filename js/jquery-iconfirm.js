@@ -130,6 +130,7 @@ proxy.defaults = {
     animationSpeed: 400,
     slogan: false,
     backgroundDismiss: false,
+    gap: 10,
     buttons: {
 
     },
@@ -154,17 +155,19 @@ function Iconfirm(options){
                     '<div class="iconfirm__bg modal__bg--hidden"></div>' +
                     '<div class="iconfirm__container">' +
                         '<div class="iconfirm__cell">' +
-                            '<div class="iconfirm__wrap iconfirm__wrap--sacle">' +
-                                '<div class="iconfirm__head">' +
-                                    '<div class="iconfirm__close-icon">×</div>' +
-                                    '<div class="iconfirm__slogan"></div>' +
-                                    '<div class="iconfirm__title"></div>' +
-                                '</div>' +
-                                '<div class="iconfirm__main">' +
-                                    '<div class="iconfirm__content"></div>' +
-                                '</div>' +
-                                '<div class="iconfirm__foot">' +
-                                    '<div class="iconfirm__buttons">' +
+                            '<div class="iconfirm__move-container">' +
+                                '<div class="iconfirm__wrap iconfirm__wrap--sacle">' +
+                                    '<div class="iconfirm__head">' +
+                                        '<div class="iconfirm__close-icon">×</div>' +
+                                        '<div class="iconfirm__slogan"></div>' +
+                                        '<div class="iconfirm__title"></div>' +
+                                    '</div>' +
+                                    '<div class="iconfirm__main">' +
+                                        '<div class="iconfirm__content"></div>' +
+                                    '</div>' +
+                                    '<div class="iconfirm__foot">' +
+                                        '<div class="iconfirm__buttons">' +
+                                        '</div>' +
                                     '</div>' +
                                 '</div>' +
                             '</div>' +
@@ -190,17 +193,19 @@ Iconfirm.prototype.buildUI = function(){
     var self = this;
     var $template = this.$template;
 
-    this.$bg      = $template.find('.iconfirm__bg');
-    this.$slogan  = $template.find('.iconfirm__slogan');
-    this.$title   = $template.find('.iconfirm__title');
-    this.$cell    = $template.find('.iconfirm__cell');
-    this.$content = $template.find('.iconfirm__content');
-    this.$wrap    = $template.find('.iconfirm__wrap');
-    this.$slogan  = $template.find('.iconfirm__slogan');
-    this.$buttons = $template.find('.iconfirm__buttons');
-    this.$closeIcon = $template.find('.iconfirm__close-icon');
-    this.$container = $template.find('.iconfirm__container');
-    this.$confirm = $template.appendTo(this.options.container);
+    this.$bg            = $template.find('.iconfirm__bg');
+    this.$slogan        = $template.find('.iconfirm__slogan');
+    this.$title         = $template.find('.iconfirm__title');
+    this.$cell          = $template.find('.iconfirm__cell');
+    this.$content       = $template.find('.iconfirm__content');
+    this.$wrap          = $template.find('.iconfirm__wrap');
+    this.$head          = $template.find('.iconfirm__head');
+    this.$slogan        = $template.find('.iconfirm__slogan');
+    this.$buttons       = $template.find('.iconfirm__buttons');
+    this.$closeIcon     = $template.find('.iconfirm__close-icon');
+    this.$container     = $template.find('.iconfirm__container');
+    this.$moveContainer = $template.find('.iconfirm__move-container');
+    this.$confirm       = $template.appendTo(this.options.container);
 
     this.contentReady = $.Deferred();
 
@@ -235,6 +240,7 @@ Iconfirm.prototype.buildUI = function(){
     // 执行动画效果
     this.$bg.css(this.setAnimationCSS(this.options.animationSpeed, 1));
     this.$wrap.css(this.setAnimationCSS(this.options.animationSpeed, 1));
+    
 };
 
 Iconfirm.prototype.shake = function(){
@@ -359,7 +365,6 @@ Iconfirm.prototype.open = function(){
         if(typeof that.onOpen === 'function'){
             that.onOpen();
         }
-
     }, that.options.animationSpeed);
 };
 
@@ -377,9 +382,60 @@ Iconfirm.prototype.close = function(){
 };
 
 Iconfirm.prototype.setDraggable = function(){
+    var that = this;
+
+    this.isPress    = false;
+    this.startPos   = { x: 0, y: 0 };
+    this.currentPos = { x: 0, y: 0 };
+    this.lastPos    = { x: 0, y: 0 };
+
+    this.$head.on('mousedown', function(e){
+        if(that.isPress){return;}
+
+        that.startPos = {
+            x: e.clientX,
+            y: e.clientY
+        };
+
+        that.isPress = true;
+    });
+
+    $(document).on('mousemove', function(e){
+        if(!that.isPress){return;}
+
+        that.currentPos = {
+            x: e.clientX - that.startPos.x + that.lastPos.x,
+            y: e.clientY - that.startPos.y + that.lastPos.y
+        };
+
+        that.setContainerPosition();
+
+        return false;
+    });
+
+    $(document).on('mouseup', function(e){
+        if(!that.isPress){return;}
+
+        that.lastPos = {
+            x: that.currentPos.x,
+            y: that.currentPos.y
+        };
+
+        that.isPress = false;
+    });
+
 };
 
 Iconfirm.prototype.setStartingPosition = function(){
+
+};
+
+
+Iconfirm.prototype.setContainerPosition = function(){
+
+    this.$moveContainer.css({
+        transform: 'translate(' + this.currentPos.x +'px, ' + this.currentPos.y  + 'px)'
+    });
 };
 
 Iconfirm.prototype.showLoading = function(){

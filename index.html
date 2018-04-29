@@ -14,7 +14,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            overflow: auto;
+            overflow-x: hidden;
         }
         .iconfirm__bg{
             position: fixed;
@@ -43,6 +43,9 @@
         .iconfirm__head{
             position: relative;
             padding: 30px 0 0 0;
+        }
+        .iconfirm__head:active{
+            cursor: move;
         }
         .iconfirm__slogan{
             text-align: center;
