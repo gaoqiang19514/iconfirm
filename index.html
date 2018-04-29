@@ -332,7 +332,7 @@
 
     // 解绑银行卡
     var unbind_bank_card = $('#J_unbind_bank_card_template').html();
-    // $('.example-1').on('click', function(e){
+    $('.example-1').on('click', function(e){
         $.idialog({
             title: '解绑银行卡',
             content: unbind_bank_card,
@@ -430,7 +430,7 @@
                 });
             }
         });
-    // });
+    });
 
     // 提现
     $('.example-2').on('click', function(e){
@@ -480,14 +480,14 @@
 
     // 提现说明
     var withdraw_template = $('#J_withdraw_template').html();
-    $('.example-6').on('click', function(e){
+    // $('.example-6').on('click', function(e){
         $.idialog({
             width: 800,
             title: '提现说明',
             content: withdraw_template,
             backgroundDismiss: true
         });
-    });
+    // });
 
 </script>
 </body>

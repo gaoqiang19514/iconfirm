@@ -15,40 +15,40 @@ var buildOptions = function (options, option2) {
     return options;
 };
 
-var getObjectKeys = function(buttons){
-    if(typeof buttons !== 'object'){
+var getObjectKeys = function (buttons) {
+    if (typeof buttons !== 'object') {
         return [];
     }
-    
+
     var arr = [];
-    $.each(buttons, function(){
+    $.each(buttons, function () {
         arr.push(this);
     });
-    
+
     return arr;
 };
 
-var getObjectKeyOfIndex = function(obj, index){
+var getObjectKeyOfIndex = function (obj, index) {
     var count = 0;
     var key = null;
-    $.each(obj, function(_index, item){
-        if(count === index){
+    $.each(obj, function (_index, item) {
+        if (count === index) {
             key = _index;
 
             return false;
         }
         count++;
     });
-    
+
     return key;
 };
 
-var getTypeButton = function(options, type){
-    if(!options || !type){
+var getTypeButton = function (options, type) {
+    if (!options || !type) {
         return {};
     }
 
-    switch(type){
+    switch (type) {
         case 'confirm':
             var buttons = {};
             var enableDefaultButtons = options['buttons'] !== false;
@@ -56,9 +56,9 @@ var getTypeButton = function(options, type){
             if (typeof options['buttons'] !== 'object') {
                 buttons = {};
             }
-          
+
             var len = getObjectKeys(buttons).length;
-            if(len === 0 && enableDefaultButtons){
+            if (len === 0 && enableDefaultButtons) {
                 buttons = $.extend(true, {}, proxy.defaults.defaultButtons);
             }
 
@@ -72,10 +72,10 @@ var getTypeButton = function(options, type){
             }
 
             buttons = options['buttons'] ? options['buttons'] : {};
-            
+
             var len = getObjectKeys(options['buttons']).length;
-        
-            if(len === 0 && enableDefaultButtons){
+
+            if (len === 0 && enableDefaultButtons) {
                 var newButtons = $.extend(true, {}, proxy.defaults.defaultButtons);
                 var first = getObjectKeyOfIndex(newButtons, 0);
                 buttons[first] = newButtons[first];
@@ -89,37 +89,37 @@ var getTypeButton = function(options, type){
     return {};
 };
 
-$.iconfirm = function(options, options2){
+$.iconfirm = function (options, options2) {
     options = buildOptions(options, options2);
 
     options['buttons'] = getTypeButton(options, 'confirm');
 
-    proxy(options);    
+    proxy(options);
 };
 
-$.ialert = function(options, options2){
+$.ialert = function (options, options2) {
     options = buildOptions(options, options2);
 
     options['buttons'] = getTypeButton(options, 'alert');
 
-    proxy(options);    
+    proxy(options);
 };
 
-$.idialog = function(options, options2){
+$.idialog = function (options, options2) {
     options = buildOptions(options, options2);
-    
+
     options['buttons'] = getTypeButton(options, 'idialog');
 
-    proxy(options);    
+    proxy(options);
 };
 
-var proxy = function(options){
-    if (typeof options === 'undefined'){
+var proxy = function (options) {
+    if (typeof options === 'undefined') {
         options = {};
     }
 
     var pluginOptions = $.extend(true, {}, proxy.defaults, options);
-    
+
     new Iconfirm(pluginOptions);
 };
 
@@ -137,45 +137,45 @@ proxy.defaults = {
     defaultButtons: {
         ok: {
             text: '确定',
-            action: function(){}
+            action: function () {}
         },
         cancel: {
             text: '取消',
-            action: function(){}
+            action: function () {}
         }
     },
-    onOpen: function(){
+    onOpen: function () {
 
     }
 };
 
 
-function Iconfirm(options){
+function Iconfirm(options) {
     var template = '<div class="iconfirm">' +
-                    '<div class="iconfirm__bg modal__bg--hidden"></div>' +
-                    '<div class="iconfirm__container">' +
-                        '<div class="iconfirm__cell">' +
-                            '<div class="iconfirm__move-container">' +
-                                '<div class="iconfirm__wrap iconfirm__wrap--sacle">' +
-                                    '<div class="iconfirm__head">' +
-                                        '<div class="iconfirm__close-icon">×</div>' +
-                                        '<div class="iconfirm__slogan"></div>' +
-                                        '<div class="iconfirm__title"></div>' +
-                                    '</div>' +
-                                    '<div class="iconfirm__main">' +
-                                        '<div class="iconfirm__content"></div>' +
-                                    '</div>' +
-                                    '<div class="iconfirm__foot">' +
-                                        '<div class="iconfirm__buttons">' +
-                                        '</div>' +
-                                    '</div>' +
-                                '</div>' +
-                            '</div>' +
-                        '</div>' +
-                    '</div>' +
-                '</div>';
+        '<div class="iconfirm__bg modal__bg--hidden"></div>' +
+        '<div class="iconfirm__container">' +
+        '<div class="iconfirm__cell">' +
+        '<div class="iconfirm__move-container">' +
+        '<div class="iconfirm__wrap iconfirm__wrap--sacle">' +
+        '<div class="iconfirm__head">' +
+        '<div class="iconfirm__close-icon">×</div>' +
+        '<div class="iconfirm__slogan"></div>' +
+        '<div class="iconfirm__title"></div>' +
+        '</div>' +
+        '<div class="iconfirm__main">' +
+        '<div class="iconfirm__content"></div>' +
+        '</div>' +
+        '<div class="iconfirm__foot">' +
+        '<div class="iconfirm__buttons">' +
+        '</div>' +
+        '</div>' +
+        '</div>' +
+        '</div>' +
+        '</div>' +
+        '</div>' +
+        '</div>';
 
-    this.options = options;                                         
+    this.options = options;
     this.$template = $(template);
 
     $.extend(this, options);
@@ -183,39 +183,39 @@ function Iconfirm(options){
     this.init();
 }
 
-Iconfirm.prototype.init = function(){
+Iconfirm.prototype.init = function () {
     this.buildUI();
     this.bindEvent();
     this.open();
 };
 
-Iconfirm.prototype.buildUI = function(){
+Iconfirm.prototype.buildUI = function () {
     var self = this;
     var $template = this.$template;
 
-    this.$bg            = $template.find('.iconfirm__bg');
-    this.$slogan        = $template.find('.iconfirm__slogan');
-    this.$title         = $template.find('.iconfirm__title');
-    this.$cell          = $template.find('.iconfirm__cell');
-    this.$content       = $template.find('.iconfirm__content');
-    this.$wrap          = $template.find('.iconfirm__wrap');
-    this.$head          = $template.find('.iconfirm__head');
-    this.$slogan        = $template.find('.iconfirm__slogan');
-    this.$buttons       = $template.find('.iconfirm__buttons');
-    this.$closeIcon     = $template.find('.iconfirm__close-icon');
-    this.$container     = $template.find('.iconfirm__container');
+    this.$bg = $template.find('.iconfirm__bg');
+    this.$slogan = $template.find('.iconfirm__slogan');
+    this.$title = $template.find('.iconfirm__title');
+    this.$cell = $template.find('.iconfirm__cell');
+    this.$content = $template.find('.iconfirm__content');
+    this.$wrap = $template.find('.iconfirm__wrap');
+    this.$head = $template.find('.iconfirm__head');
+    this.$slogan = $template.find('.iconfirm__slogan');
+    this.$buttons = $template.find('.iconfirm__buttons');
+    this.$closeIcon = $template.find('.iconfirm__close-icon');
+    this.$container = $template.find('.iconfirm__container');
     this.$moveContainer = $template.find('.iconfirm__move-container');
-    this.$confirm       = $template.appendTo(this.options.container);
+    this.$confirm = $template.appendTo(this.options.container);
 
     this.contentReady = $.Deferred();
 
-    if(this.options.titleClass){
+    if (this.options.titleClass) {
         this.$title.addClass(this.options.titleClass)
     }
 
     this.setStartingPosition();
 
-    if(this.width){
+    if (this.width) {
         this.$wrap.css('width', this.width);
     }
 
@@ -225,14 +225,14 @@ Iconfirm.prototype.buildUI = function(){
     this.setButtonts();
     this.setDraggable();
 
-    if(this.options.isAjax){
+    if (this.options.isAjax) {
         this.showLoading();
     }
 
-    $.when(this.contentReady).then(function(){
-        if(self.isAjaxLoading){
+    $.when(this.contentReady).then(function () {
+        if (self.isAjaxLoading) {
             // 异步处理内容
-        }else{
+        } else {
             // 同步处理内容
         }
     });
@@ -240,13 +240,15 @@ Iconfirm.prototype.buildUI = function(){
     // 执行动画效果
     this.$bg.css(this.setAnimationCSS(this.options.animationSpeed, 1));
     this.$wrap.css(this.setAnimationCSS(this.options.animationSpeed, 1));
-    
+
 };
 
-Iconfirm.prototype.shake = function(){
+Iconfirm.prototype.shake = function () {
     var that = this;
 
-    if(that._hilightAnimating){return;}
+    if (that._hilightAnimating) {
+        return;
+    }
 
     that.$wrap.addClass('hilight-shake');
     this._hilightAnimating = true;
@@ -256,55 +258,59 @@ Iconfirm.prototype.shake = function(){
     }, 820);
 };
 
-Iconfirm.prototype.bindEvent = function(){
+Iconfirm.prototype.bindEvent = function () {
     var that = this;
 
     var $target;
-    that.$container.on('click', function(e){
+    that.$container.on('click', function (e) {
         $target = $(e.target);
-        if(!$target.closest('.iconfirm__wrap').length){
-            if(that.backgroundDismiss){
+        if (!$target.closest('.iconfirm__wrap').length) {
+            if (that.backgroundDismiss) {
                 that.close();
-            }else{
+            } else {
                 that.shake();
             }
         }
     });
 
+    $(window).on('resize', function (e) {
+        that.resetDrag();
+    });
+
 };
 
-Iconfirm.prototype.setTitle = function(){
+Iconfirm.prototype.setTitle = function () {
     this.$title.html(this.options.title);
 };
 
-Iconfirm.prototype.setSlogan = function(){
-    if(!this.options.slogan){
+Iconfirm.prototype.setSlogan = function () {
+    if (!this.options.slogan) {
         this.$slogan.hide();
         return;
     }
     this.$slogan.html(this.options.slogan);
 };
 
-Iconfirm.prototype.setContent = function(){
+Iconfirm.prototype.setContent = function () {
     this.$content.html(this.options.content);
 };
 
-Iconfirm.prototype.setButtonts = function(){
+Iconfirm.prototype.setButtonts = function () {
     var self = this;
 
     var buttons = this.buttons;
 
     var buttons_count = 0;
-    if(typeof buttons !== 'object'){
+    if (typeof buttons !== 'object') {
         buttons = {};
     }
 
-    $.each(buttons, function(key, button) {
+    $.each(buttons, function (key, button) {
         buttons_count++;
 
 
         // 包装用户传入的参数 如果不是预期的格式
-        if(typeof button === 'function'){
+        if (typeof button === 'function') {
             self.options.buttons[key] = button = {
                 action: button
             };
@@ -313,14 +319,13 @@ Iconfirm.prototype.setButtonts = function(){
         buttons[key].text = button.text || key;
         buttons[key].btnClass = button.btnClass || 'btn-default';
         // 如果用户没有传入action 这赋值一个空的函数来替代
-        buttons[key].action = button.action || function(){
-        };
+        buttons[key].action = button.action || function () {};
 
         buttons[key].keys = button.keys || [];
         buttons[key].isHidden = button.isHidden || false;
         buttons[key].isDisabled = button.isDisabled || false;
 
-        $.each(buttons[key].keys, function(i, a){
+        $.each(buttons[key].keys, function (i, a) {
             buttons[key].keys[i] = a.toLowerCase();
         });
 
@@ -329,12 +334,12 @@ Iconfirm.prototype.setButtonts = function(){
             .addClass(buttons[key].btnClass)
             .prop('disabled', buttons[key].isDisabled)
             .css('display', buttons[key].isHidden ? 'none' : '')
-            .click(function(e){
+            .click(function (e) {
                 e.preventDefault();
                 // 执行传入的action函数 
                 var res = buttons[key].action.apply(self, [buttons[key]]);
 
-                if(typeof res === 'undefined' || res){
+                if (typeof res === 'undefined' || res) {
                     self.close();
                 }
             });
@@ -343,54 +348,72 @@ Iconfirm.prototype.setButtonts = function(){
 
     });
 
-    if(buttons_count === 0) this.$buttons.hide();
+    if (buttons_count === 0) this.$buttons.hide();
 
-    if(buttons_count > 1){
+    if (buttons_count > 1) {
         self.$buttons.addClass('iconfirm__buttons--multipe');
     }
 
-    self.$closeIcon.on('click', function(e){
+    self.$closeIcon.on('click', function (e) {
         self.close();
     });
 };
 
-Iconfirm.prototype.open = function(){
+Iconfirm.prototype.open = function () {
     var that = this;
     this.$wrap.offset();
 
     this.$wrap.removeClass('iconfirm__wrap--sacle');
     this.$bg.removeClass('modal__bg--hidden');
 
-    setTimeout(function(){
-        if(typeof that.onOpen === 'function'){
+    setTimeout(function () {
+        if (typeof that.onOpen === 'function') {
             that.onOpen();
         }
     }, that.options.animationSpeed);
 };
 
-Iconfirm.prototype.close = function(){
+Iconfirm.prototype.close = function () {
     var that = this;
 
     this.$wrap.addClass('iconfirm__wrap--sacle');
     this.$bg.addClass('modal__bg--hidden');
 
-    setTimeout(function(){
+    setTimeout(function () {
 
         that.$confirm.remove();
 
     }, that.options.animationSpeed);
 };
 
-Iconfirm.prototype.setDraggable = function(){
+Iconfirm.prototype.resetDrag = function () {
+    this.isPress = false;
+    this.startPos = {
+        x: 0,
+        y: 0
+    };
+    this.currentPos = {
+        x: 0,
+        y: 0
+    };
+    this.lastPos = {
+        x: 0,
+        y: 0
+    };
+
+    this.$moveContainer.css({
+        transform: 'translate(' + this.currentPos.x + 'px, ' + this.currentPos.y + 'px)'
+    });
+};
+
+Iconfirm.prototype.setDraggable = function () {
     var that = this;
 
-    this.isPress    = false;
-    this.startPos   = { x: 0, y: 0 };
-    this.currentPos = { x: 0, y: 0 };
-    this.lastPos    = { x: 0, y: 0 };
-
-    this.$head.on('mousedown', function(e){
-        if(that.isPress){return;}
+    this.resetDrag();
+    this.$head.on('mousedown', function (e) {
+        if (that.isPress) {
+            return;
+        }
 
         that.startPos = {
             x: e.clientX,
@@ -400,21 +423,25 @@ Iconfirm.prototype.setDraggable = function(){
         that.isPress = true;
     });
 
-    $(document).on('mousemove', function(e){
-        if(!that.isPress){return;}
+    $(document).on('mousemove', function (e) {
+        if (!that.isPress) {
+            return;
+        }
 
         that.currentPos = {
             x: e.clientX - that.startPos.x + that.lastPos.x,
             y: e.clientY - that.startPos.y + that.lastPos.y
         };
 
-        that.setContainerPosition();
+        that.setDrag();
 
         return false;
     });
 
-    $(document).on('mouseup', function(e){
-        if(!that.isPress){return;}
+    $(document).on('mouseup', function (e) {
+        if (!that.isPress) {
+            return;
+        }
 
         that.lastPos = {
             x: that.currentPos.x,
@@ -426,25 +453,50 @@ Iconfirm.prototype.setDraggable = function(){
 
 };
 
-Iconfirm.prototype.setStartingPosition = function(){
+Iconfirm.prototype.setStartingPosition = function () {
 
 };
 
+Iconfirm.prototype.setDrag = function () {
+    var $box = this.$wrap, $container = this.$container, $window = $(window);
 
-Iconfirm.prototype.setContainerPosition = function(){
+
+
+    var winW = $window.width();
+    var winH = $window.height();
+    var boxW = $box.width();
+    var boxH = $box.height();
+    var containerH = $container.height()
+
+    var minLeft = (winW - boxW) / 2;
+    var minTop = (winH - boxH) / 2;
+    var scrollTop = (containerH - winH) / 2;
+
+    if(this.currentPos.x + minLeft < 0){
+        this.currentPos.x = -minLeft;
+    }
+
+    if(this.currentPos.x - minLeft > 0){
+        this.currentPos.x = minLeft;
+    }
+
+    if((this.currentPos.y + minTop + scrollTop)  < 0){
+        this.currentPos.y = -minTop -  scrollTop;
+    }
+
+    this.currentPos.x = parseInt(this.currentPos.x);
+    this.currentPos.y = parseInt( this.currentPos.y);
 
     this.$moveContainer.css({
-        transform: 'translate(' + this.currentPos.x +'px, ' + this.currentPos.y  + 'px)'
+        transform: 'translate(' + this.currentPos.x + 'px, ' + this.currentPos.y + 'px)'
     });
 };
 
-Iconfirm.prototype.showLoading = function(){
-};
+Iconfirm.prototype.showLoading = function () {};
 
-Iconfirm.prototype.hideLoading = function(){
-};
+Iconfirm.prototype.hideLoading = function () {};
 
-Iconfirm.prototype.setAnimationCSS = function(speed){
+Iconfirm.prototype.setAnimationCSS = function (speed) {
     var bounce = 1;
     var cubic_bezier = '0.36, 0.55, 0.19';
 
@@ -456,27 +508,29 @@ Iconfirm.prototype.setAnimationCSS = function(speed){
     };
 };
 
-Iconfirm.prototype.example = function(){
+Iconfirm.prototype.example = function () {
 
 };
 
-$.prototype.iconfirm = function(options, options2){
-    if(typeof options === 'undefined'){
+$.prototype.iconfirm = function (options, options2) {
+    if (typeof options === 'undefined') {
         options = {};
     }
 
-    if(typeof options === 'string'){
+    if (typeof options === 'string') {
         options = {
             content: options,
             title: options2 ? options2 : false
         };
     }
 
-    $(this).each(function(){
+    $(this).each(function () {
         var $this = $(this);
-        if($this.data('init')){ return; }
+        if ($this.data('init')) {
+            return;
+        }
 
-        $this.on('click', function(){
+        $this.on('click', function () {
             $.iconfirm(options);
         });
 
