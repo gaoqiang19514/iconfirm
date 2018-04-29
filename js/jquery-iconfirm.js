@@ -123,14 +123,21 @@ var proxy = function (options) {
     new Iconfirm(pluginOptions);
 };
 
+proxy.lastClicked = false;
+
+$(document).on('mousedown', 'button, a', function () {
+    proxy.lastClicked = $(this);
+});
+
 proxy.defaults = {
     title: '',
     content: '',
     container: 'body',
     animationSpeed: 400,
     slogan: false,
-    backgroundDismiss: false,
+    backgroundDismiss: true,
     dragWindowGap: 20,
+    animateFromElement: true,
     buttons: {
 
     },
@@ -193,19 +200,18 @@ Iconfirm.prototype.buildUI = function () {
     var self = this;
     var $template = this.$template;
 
-    this.$bg = $template.find('.iconfirm__bg');
-    this.$slogan = $template.find('.iconfirm__slogan');
-    this.$title = $template.find('.iconfirm__title');
-    this.$cell = $template.find('.iconfirm__cell');
-    this.$content = $template.find('.iconfirm__content');
-    this.$wrap = $template.find('.iconfirm__wrap');
-    this.$head = $template.find('.iconfirm__head');
-    this.$slogan = $template.find('.iconfirm__slogan');
-    this.$buttons = $template.find('.iconfirm__buttons');
-    this.$closeIcon = $template.find('.iconfirm__close-icon');
-    this.$container = $template.find('.iconfirm__container');
+    this.$bg            = $template.find('.iconfirm__bg');
+    this.$title         = $template.find('.iconfirm__title');
+    this.$cell          = $template.find('.iconfirm__cell');
+    this.$content       = $template.find('.iconfirm__content');
+    this.$wrap          = $template.find('.iconfirm__wrap');
+    this.$head          = $template.find('.iconfirm__head');
+    this.$slogan        = $template.find('.iconfirm__slogan');
+    this.$buttons       = $template.find('.iconfirm__buttons');
+    this.$closeIcon     = $template.find('.iconfirm__close-icon');
+    this.$container     = $template.find('.iconfirm__container');
     this.$moveContainer = $template.find('.iconfirm__move-container');
-    this.$confirm = $template.appendTo(this.options.container);
+    this.$confirm       = $template.appendTo(this.options.container);
 
     this.contentReady = $.Deferred();
 
@@ -240,9 +246,50 @@ Iconfirm.prototype.buildUI = function () {
     // 执行动画效果
     this.$bg.css(this.setAnimationCSS(this.options.animationSpeed, 1));
     this.$wrap.css(this.setAnimationCSS(this.options.animationSpeed, 1));
-
+    this.$cell.css(this.setAnimationCSS(this.options.animationSpeed, 1));
 };
 
+Iconfirm.prototype.scrollTop = function(){
+    if (typeof pageYOffset !== 'undefined') {
+        //most browsers except IE before #9
+        return pageYOffset;
+    } else {
+        var B = document.body; //IE 'quirks'
+        var D = document.documentElement; //IE with doctype
+        D = (D.clientHeight) ? D : B;
+        return D.scrollTop;
+    }
+};
+
+Iconfirm.prototype.setStartingPosition = function(){
+    var el = false;
+    if(this.animateFromElement && proxy.lastClicked){
+        el = proxy.lastClicked;
+        proxy.lastClicked = false;
+    }
+
+    if(!el){return false;}
+
+    // 获取按钮的offset 相对于文档 也就是document的位置
+    var offset = el.offset();
+
+    var left = (el.outerWidth() - this.$wrap.outerWidth()) / 2;
+    var top = (el.outerHeight() - this.$wrap.outerHeight()) / 2;
+
+    left = offset.left + left;
+    top = offset.top - this.scrollTop() + top;
+
+    var winW = $(window).width() / 2;
+    var winH = $(window).height() / 2;
+
+    var targetW = winW - (this.$wrap.outerWidth() / 2);
+    var targetH = winH - (this.$wrap.outerHeight() / 2);
+    
+    var sourceLeft = left - targetW;
+    var sourceTop = top - targetH;
+
+    this.$cell.css('transform', 'translate(' + sourceLeft + 'px, ' + sourceTop + 'px)');
+};
 Iconfirm.prototype.shake = function () {
     var that = this;
 
@@ -366,6 +413,8 @@ Iconfirm.prototype.open = function () {
     this.$wrap.removeClass('iconfirm__wrap--sacle');
     this.$bg.removeClass('modal__bg--hidden');
 
+    this.$cell.css('transform', 'translate(' + 0 + 'px, ' + 0 + 'px)');
+
     setTimeout(function () {
         if (typeof that.onOpen === 'function') {
             that.onOpen();
@@ -453,14 +502,9 @@ Iconfirm.prototype.setDraggable = function () {
 
 };
 
-Iconfirm.prototype.setStartingPosition = function () {
-
-};
 
 Iconfirm.prototype.setDrag = function () {
     var $box = this.$wrap, $container = this.$container, $window = $(window);
-
-    // dragWindowGap
 
     var winW       = $window.width();
     var winH       = $window.height();
