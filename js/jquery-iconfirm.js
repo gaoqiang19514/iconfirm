@@ -42,13 +42,12 @@ var getObjectKeys = function (buttons) {
     return arr;
 };
 
-var getObjectOfIndex = function (obj, index) {
+var getObjectKeyOfIndex = function (obj, index) {
     var count = 0, res = null;
 
-    $.each(obj, function () {
-        // 如果当前遍历到的index === 要找的index
+    $.each(obj, function (key) {
         if (count === index) {
-            res = this;
+            res = key;
             return false;
         }
         count++;
@@ -57,75 +56,78 @@ var getObjectOfIndex = function (obj, index) {
     return res;
 };
 
-var getTypeButton = function (options, type) {
-    if (!options || !type) {
-        return {};
-    }
+var getTypeButtons = function (options, type) {
+    if (!options || !type) { return {}; }
 
     switch (type) {
         case 'confirm':
             var buttons = {};
-            var enableDefaultButtons = options['buttons'] !== false;
 
-            if (typeof options['buttons'] !== 'object') {
-                buttons = {};
+            if(isObject(options['buttons'])){
+                buttons = options['buttons'];
             }
 
-            var len = getObjectKeys(buttons).length;
-            if (len === 0 && enableDefaultButtons) {
-                buttons = $.extend(true, {}, proxy.defaults.defaultButtons);
+            if (getObjectKeys(buttons).length === 0 && (buttons !== false)) {
+                buttons = $.extend({}, proxy.defaults.defaultButtons);
             }
-
+  
             return buttons;
         case 'alert':
             var buttons = {};
-            var enableDefaultButtons = options['buttons'] !== false;
 
-            if (typeof options['buttons'] !== 'object') {
-                buttons = {};
+            if(isObject(options['buttons'])){
+                buttons = options['buttons'];
             }
-
-            buttons = options['buttons'] ? options['buttons'] : {};
-
-            var len = getObjectKeys(options['buttons']).length;
-
-            if (len === 0 && enableDefaultButtons) {
-                var newButtons = $.extend(true, {}, proxy.defaults.defaultButtons);
-                var first = getObjectOfIndex(newButtons, 0);
-                buttons[first] = first;
+    
+            if (getObjectKeys(buttons).length === 0 && (buttons !== false)) {
+                var defaultButtons = $.extend({}, proxy.defaults.defaultButtons);
+                var first = getObjectKeyOfIndex(defaultButtons, 0);
+                buttons[first] = defaultButtons[first];
             }
 
             return buttons;
         case 'dialog':
             return {};
     }
-
-    return {};
 };
 
-$.iconfirm = function (options, options2) {
-    options = buildOptions(options, options2);
 
-    options['buttons'] = getTypeButton(options, 'confirm');
+// ----------------------------------------------------------------------------------------
+
+$.iconfirm = function (options, options2) {
+    var buttons = {};
+
+    options = buildOptions(options, options2);
+    buttons = getTypeButtons(options, 'confirm');
+
+    options['buttons'] = buttons;
 
     proxy(options);
 };
 
 $.ialert = function (options, options2) {
-    options = buildOptions(options, options2);
+    var buttons = {};
 
-    options['buttons'] = getTypeButton(options, 'alert');
+    options = buildOptions(options, options2);
+    buttons = getTypeButtons(options, 'alert');
+
+    options['buttons'] = buttons;
 
     proxy(options);
 };
 
 $.idialog = function (options, options2) {
-    options = buildOptions(options, options2);
+    var buttons = {};
 
-    options['buttons'] = getTypeButton(options, 'idialog');
+    options = buildOptions(options, options2);
+    buttons = getTypeButtons(options, 'dialog');
+    
+    options['buttons'] = buttons;
 
     proxy(options);
 };
+
+// ----------------------------------------------------------------------------------------
 
 var proxy = function (options) {
     if (typeof options === 'undefined') {
@@ -144,17 +146,15 @@ $(document).on('mousedown', 'button, a', function () {
 });
 
 proxy.defaults = {
-    title: '',
-    content: '',
-    container: 'body',
-    animationSpeed: 400,
-    slogan: false,
-    backgroundDismiss: true,
-    dragWindowGap: 20,
+    title:              '',
+    content:            '',
+    container:          'body',
+    animationSpeed:     400,
+    slogan:             false,
+    backgroundDismiss:  true,
+    dragWindowGap:      20,
     animateFromElement: true,
-    buttons: {
-
-    },
+    buttons:            {},
     defaultButtons: {
         ok: {
             text: '确定',
@@ -165,38 +165,38 @@ proxy.defaults = {
             action: function () {}
         }
     },
-    onOpen: function () {
-
-    }
+    onOpen: function () {}
 };
 
 
 function Iconfirm(options) {
     var template = '<div class="iconfirm">' +
-        '<div class="iconfirm__bg modal__bg--hidden"></div>' +
-        '<div class="iconfirm__container">' +
-        '<div class="iconfirm__cell">' +
-        '<div class="iconfirm__move-container">' +
-        '<div class="iconfirm__wrap iconfirm__wrap--sacle">' +
-        '<div class="iconfirm__head">' +
-        '<div class="iconfirm__close-icon">×</div>' +
-        '<div class="iconfirm__slogan"></div>' +
-        '<div class="iconfirm__title"></div>' +
-        '</div>' +
-        '<div class="iconfirm__main">' +
-        '<div class="iconfirm__content"></div>' +
-        '</div>' +
-        '<div class="iconfirm__foot">' +
-        '<div class="iconfirm__buttons">' +
-        '</div>' +
-        '</div>' +
-        '</div>' +
-        '</div>' +
-        '</div>' +
-        '</div>' +
+            '<div class="iconfirm__bg modal__bg--hidden"></div>' +
+            '<div class="iconfirm__container">' +
+                '<div class="iconfirm__cell">' +
+                '<div class="iconfirm__animation-starting-position">' +
+                        '<div class="iconfirm__move-container">' +
+                            '<div class="iconfirm__wrap iconfirm__wrap--sacle">' +
+                                '<div class="iconfirm__head">' +
+                                    '<div class="iconfirm__close-icon">×</div>' +
+                                    '<div class="iconfirm__slogan"></div>' +
+                                    '<div class="iconfirm__title"></div>' +
+                                '</div>' +
+                                '<div class="iconfirm__main">' +
+                                    '<div class="iconfirm__content"></div>' +
+                                '</div>' +
+                                '<div class="iconfirm__foot">' +
+                                    '<div class="iconfirm__buttons">' +
+                                '</div>' +
+                            '</div>' +
+                        '</div>' +
+                    '</div>' +
+                '</div>' +
+            '</div>' +
+            '</div>' +
         '</div>';
 
-    this.options = options;
+    this.options   = options;
     this.$template = $(template);
 
     $.extend(this, options);
@@ -211,8 +211,8 @@ Iconfirm.prototype.init = function () {
 };
 
 Iconfirm.prototype.buildUI = function () {
-    var self = this;
-    var $template = this.$template;
+    var self            = this;
+    var $template       = this.$template;
 
     this.$bg            = $template.find('.iconfirm__bg');
     this.$title         = $template.find('.iconfirm__title');
@@ -225,13 +225,14 @@ Iconfirm.prototype.buildUI = function () {
     this.$closeIcon     = $template.find('.iconfirm__close-icon');
     this.$container     = $template.find('.iconfirm__container');
     this.$moveContainer = $template.find('.iconfirm__move-container');
+
+    this.$startingPostion = $template.find('.iconfirm__animation-starting-position');
+
     this.$confirm       = $template.appendTo(this.options.container);
 
-    this.contentReady = $.Deferred();
+    this.$win           = $(window);
 
-    if (this.options.titleClass) {
-        this.$title.addClass(this.options.titleClass)
-    }
+    this.contentReady   = $.Deferred();
 
     this.setStartingPosition();
 
@@ -245,6 +246,9 @@ Iconfirm.prototype.buildUI = function () {
     this.setButtonts();
     this.setDraggable();
 
+    // 这里的副作用解决了slogan弹层动画起始位置错误的问题
+    this.fixScrollbar();
+    
     if (this.options.isAjax) {
         this.showLoading();
     }
@@ -260,7 +264,7 @@ Iconfirm.prototype.buildUI = function () {
     // 执行动画效果
     this.$bg.css(this.setAnimationCSS(this.options.animationSpeed, 1));
     this.$wrap.css(this.setAnimationCSS(this.options.animationSpeed, 1));
-    this.$cell.css(this.setAnimationCSS(this.options.animationSpeed, 1));
+    this.$startingPostion.css(this.setAnimationCSS(this.options.animationSpeed, 1));
 };
 
 Iconfirm.prototype.measureScrollbarWidth = function(){
@@ -292,19 +296,17 @@ Iconfirm.prototype.setStartingPosition = function(){
         proxy.lastClicked = false;
     }
 
-    if(!el){return false;}
+    if(!el.length){return false;}
 
-    // 获取按钮的offset 相对于文档 也就是document的位置
     var offset = el.offset();
+    var left   = (el.outerWidth() - this.$wrap.outerWidth()) / 2;
+    var top    = (el.outerHeight() - this.$wrap.outerHeight()) / 2;
 
-    var left = (el.outerWidth() - this.$wrap.outerWidth()) / 2;
-    var top = (el.outerHeight() - this.$wrap.outerHeight()) / 2;
+    left       = offset.left + left;
+    top        = offset.top - this.scrollTop() + top;
 
-    left = offset.left + left;
-    top = offset.top - this.scrollTop() + top;
-
-    var winW = $(window).width() / 2;
-    var winH = $(window).height() / 2;
+    var winW = this.$win.width() / 2;
+    var winH = this.$win.height() / 2;
 
     var targetW = winW - (this.$wrap.outerWidth() / 2);
     var targetH = winH - (this.$wrap.outerHeight() / 2);
@@ -312,8 +314,9 @@ Iconfirm.prototype.setStartingPosition = function(){
     var sourceLeft = left - targetW;
     var sourceTop = top - targetH;
 
-    this.$cell.css('transform', 'translate(' + sourceLeft + 'px, ' + sourceTop + 'px)');
+    this.$startingPostion.css('transform', 'translate(' + sourceLeft + 'px, ' + sourceTop + 'px)');
 };
+
 Iconfirm.prototype.shake = function () {
     var that = this;
 
@@ -329,7 +332,7 @@ Iconfirm.prototype.shake = function () {
     }, 820);
 };
 
-Iconfirm.prototype.bindEvent = function () {
+Iconfirm.prototype.bindEvent = function () {    
     var that = this;
 
     var $target;
@@ -344,84 +347,77 @@ Iconfirm.prototype.bindEvent = function () {
         }
     });
 
-    $(window).on('resize', function (e) {
+    that.$win.on('resize', function (e) {
         that.resetDrag();
     });
 
 };
 
 Iconfirm.prototype.setTitle = function () {
-    this.$title.html(this.options.title);
+    this.$title.html(this.title);
 };
 
 Iconfirm.prototype.setSlogan = function () {
     if (!this.slogan) {
         this.$slogan.hide();
-        return;
+    }else{
+        this.$slogan.html(this.slogan);
     }
-    this.$slogan.html(this.slogan);
 };
 
 Iconfirm.prototype.setContent = function () {
-    this.$content.html(this.options.content);
+    this.$content.html(this.content);
 };
 
 Iconfirm.prototype.setButtonts = function () {
-    var self = this;
-
-    var buttons = this.buttons;
-
+    var self          = this;
     var buttons_count = 0;
-    if (typeof buttons !== 'object') {
+    var buttons       = this.buttons;
+
+    if (!isObject(buttons)) {
         buttons = {};
     }
 
     $.each(buttons, function (key, button) {
         buttons_count++;
 
-
-        // 包装用户传入的参数 如果不是预期的格式
         if (typeof button === 'function') {
-            self.options.buttons[key] = button = {
+            self.buttons[key] = button = {
                 action: button
             };
         }
 
-        buttons[key].text = button.text || key;
-        buttons[key].btnClass = button.btnClass || 'btn-default';
-        // 如果用户没有传入action 这赋值一个空的函数来替代
-        buttons[key].action = button.action || function () {};
+        button.text       = button.text || key;
+        button.btnClass   = button.btnClass || 'btn-default';
+        button.action     = button.action || function () {};
+        button.keys       = button.keys || [];
+        button.isHidden   = button.isHidden || false;
+        button.isDisabled = button.isDisabled || false;
 
-        buttons[key].keys = button.keys || [];
-        buttons[key].isHidden = button.isHidden || false;
-        buttons[key].isDisabled = button.isDisabled || false;
-
-        $.each(buttons[key].keys, function (i, a) {
-            buttons[key].keys[i] = a.toLowerCase();
+        $.each(button.keys, function (i, item) {
+            button.keys[i] = item.toLowerCase();
         });
 
         var button_element = $('<button type="button" class="iconfirm__btn"></button>')
-            .html(buttons[key].text)
-            .addClass(buttons[key].btnClass)
-            .prop('disabled', buttons[key].isDisabled)
-            .css('display', buttons[key].isHidden ? 'none' : '')
+            .html(button.text)
+            .addClass(button.btnClass)
+            .prop('disabled', button.isDisabled)
+            .css('display', button.isHidden ? 'none' : '')
             .click(function (e) {
-                e.preventDefault();
-                // 执行传入的action函数 
-                var res = buttons[key].action.apply(self, [buttons[key]]);
-
+                var res = button.action.apply(self, [button]);
                 if (typeof res === 'undefined' || res) {
                     self.close();
                 }
+
+                return false;
             });
 
         self.$buttons.append(button_element);
-
     });
 
-    if (buttons_count === 0) this.$buttons.hide();
-
-    if (buttons_count > 1) {
+    if (buttons_count === 0){
+        this.$buttons.hide()
+    }else if(buttons_count > 1){
         self.$buttons.addClass('iconfirm__buttons--multipe');
     }
 
@@ -430,34 +426,28 @@ Iconfirm.prototype.setButtonts = function () {
     });
 };
 
-Iconfirm.prototype.open = function () {
-    var that = this;
-    this.$wrap.offset();
-
-    this.$wrap.removeClass('iconfirm__wrap--sacle');
-    this.$bg.removeClass('modal__bg--hidden');
-
-    this.$cell.css('transform', 'translate(' + 0 + 'px, ' + 0 + 'px)');
-
-
-    var winH = $(window).height();
-
-    var containerH = that.$container.height()
+Iconfirm.prototype.fixScrollbar = function(){
+    var winH       = this.$win.height();
+    var containerH = this.$container.height()
 
     // 如果容器高度大于window，说明出现了滚动条 所以给bg的right减去获取的滚动条宽度
     if(containerH - winH){
         var scrollbarW = this.measureScrollbarWidth();
-
         this.$bg.css("right", scrollbarW);
     }
+};
 
+Iconfirm.prototype.open = function () {
+    var that = this;
+
+    that.$wrap.removeClass('iconfirm__wrap--sacle');
+    that.$bg.removeClass('modal__bg--hidden');
+    that.$startingPostion.css('transform', 'translate(' + 0 + 'px, ' + 0 + 'px)');
 
     setTimeout(function () {
         if (typeof that.onOpen === 'function') {
             that.onOpen();
         }
-
-
     }, that.options.animationSpeed);
 };
 
@@ -468,11 +458,12 @@ Iconfirm.prototype.close = function () {
     this.$bg.addClass('modal__bg--hidden');
 
     setTimeout(function () {
-
         that.$confirm.remove();
-
     }, that.options.animationSpeed);
 };
+
+// ----------------------------------------------------------------------------------------
+// 拖曳弹层
 
 Iconfirm.prototype.resetDrag = function () {
     this.isPress = false;
@@ -509,6 +500,8 @@ Iconfirm.prototype.setDraggable = function () {
         };
 
         that.isPress = true;
+
+        return false;
     });
 
     $(document).on('mousemove', function (e) {
@@ -541,9 +534,8 @@ Iconfirm.prototype.setDraggable = function () {
 
 };
 
-
 Iconfirm.prototype.setDrag = function () {
-    var $box = this.$wrap, $container = this.$container, $window = $(window);
+    var $box = this.$wrap, $container = this.$container, $window = this.$win;
 
     var winW       = $window.width();
     var winH       = $window.height();
@@ -551,9 +543,9 @@ Iconfirm.prototype.setDrag = function () {
     var boxH       = $box.height();
     var containerH = $container.height()
 
-    var minLeft = (winW - boxW) / 2 - this.dragWindowGap;
-    var minTop  = (winH - boxH) / 2 - this.dragWindowGap;
-    var scrollTop = (containerH - winH) / 2;
+    var minLeft    = (winW - boxW) / 2 - this.dragWindowGap;
+    var minTop     = (winH - boxH) / 2 - this.dragWindowGap;
+    var scrollTop  = (containerH - winH) / 2;
 
     if(this.currentPos.x + minLeft < 0){
         this.currentPos.x = -minLeft;
@@ -575,6 +567,8 @@ Iconfirm.prototype.setDrag = function () {
     });
 };
 
+// ----------------------------------------------------------------------------------------
+
 Iconfirm.prototype.showLoading = function () {};
 
 Iconfirm.prototype.hideLoading = function () {};
@@ -591,27 +585,14 @@ Iconfirm.prototype.setAnimationCSS = function (speed) {
     };
 };
 
-Iconfirm.prototype.example = function () {
-
-};
-
 $.prototype.iconfirm = function (options, options2) {
-    if (typeof options === 'undefined') {
-        options = {};
-    }
 
-    if (typeof options === 'string') {
-        options = {
-            content: options,
-            title: options2 ? options2 : false
-        };
-    }
+    options = buildOptions(options, options2);
 
     $(this).each(function () {
         var $this = $(this);
-        if ($this.data('init')) {
-            return;
-        }
+
+        if ($this.data('init')) { return; }
 
         $this.on('click', function () {
             $.iconfirm(options);
