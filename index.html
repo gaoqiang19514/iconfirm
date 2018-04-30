@@ -331,11 +331,10 @@
 <script>
 
     // 解绑银行卡
-    var unbind_bank_card = $('#J_unbind_bank_card_template').html();
     $('.example-1').on('click', function(e){
         $.idialog({
             title: '解绑银行卡',
-            content: unbind_bank_card,
+            content: $('#J_unbind_bank_card_template').html(),
             onOpen: function(){
                 var that              = this;
                 var $phone            = this.$content.find('#J_bind_bank_card_phone');
@@ -479,12 +478,11 @@
     });
 
     // 提现说明
-    var withdraw_template = $('#J_withdraw_template').html();
     $('.example-6').on('click', function(e){
         $.idialog({
             width: 800,
             title: '提现说明',
-            content: withdraw_template,
+            content: $('#J_withdraw_template').html(),
             backgroundDismiss: true
         });
     });

@@ -1,11 +1,25 @@
 var lg = console.log;
 
+var isString = function(obj){
+    return Object.prototype.toString.call(obj) === '[object String]';
+};
+
+var isArray = function(obj){
+    return Object.prototype.toString.call(obj) === '[object Array]';
+};
+
+var isObject = function(obj){
+    return Object.prototype.toString.call(obj) === '[object Object]';
+};
+
+// 参数包装 允许用户使用字符串参数调用和对象参数调用 但是字符串参数需要进行包装
+// 并且这种参数包装逻辑不应该交给Icofirm 所以要抽取出来
 var buildOptions = function (options, option2) {
     if (typeof options === 'undefined') {
         options = {};
     }
 
-    if (typeof options === 'string') {
+    if (isString(options)) {
         options = {
             title: options,
             content: option2 ? option2 : false
@@ -16,7 +30,7 @@ var buildOptions = function (options, option2) {
 };
 
 var getObjectKeys = function (buttons) {
-    if (typeof buttons !== 'object') {
+    if (!isObject(buttons)) {
         return [];
     }
 
@@ -28,19 +42,19 @@ var getObjectKeys = function (buttons) {
     return arr;
 };
 
-var getObjectKeyOfIndex = function (obj, index) {
-    var count = 0;
-    var key = null;
-    $.each(obj, function (_index, item) {
-        if (count === index) {
-            key = _index;
+var getObjectOfIndex = function (obj, index) {
+    var count = 0, res = null;
 
+    $.each(obj, function () {
+        // 如果当前遍历到的index === 要找的index
+        if (count === index) {
+            res = this;
             return false;
         }
         count++;
     });
 
-    return key;
+    return res;
 };
 
 var getTypeButton = function (options, type) {
@@ -77,8 +91,8 @@ var getTypeButton = function (options, type) {
 
             if (len === 0 && enableDefaultButtons) {
                 var newButtons = $.extend(true, {}, proxy.defaults.defaultButtons);
-                var first = getObjectKeyOfIndex(newButtons, 0);
-                buttons[first] = newButtons[first];
+                var first = getObjectOfIndex(newButtons, 0);
+                buttons[first] = first;
             }
 
             return buttons;
@@ -213,8 +227,6 @@ Iconfirm.prototype.buildUI = function () {
     this.$moveContainer = $template.find('.iconfirm__move-container');
     this.$confirm       = $template.appendTo(this.options.container);
 
-
-    
     this.contentReady = $.Deferred();
 
     if (this.options.titleClass) {
@@ -232,7 +244,6 @@ Iconfirm.prototype.buildUI = function () {
     this.setContent();
     this.setButtonts();
     this.setDraggable();
-
 
     if (this.options.isAjax) {
         this.showLoading();
@@ -344,11 +355,11 @@ Iconfirm.prototype.setTitle = function () {
 };
 
 Iconfirm.prototype.setSlogan = function () {
-    if (!this.options.slogan) {
+    if (!this.slogan) {
         this.$slogan.hide();
         return;
     }
-    this.$slogan.html(this.options.slogan);
+    this.$slogan.html(this.slogan);
 };
 
 Iconfirm.prototype.setContent = function () {
