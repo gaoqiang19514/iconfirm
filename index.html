@@ -24,7 +24,10 @@
             bottom: 0;
             background-color: rgba(0, 0, 0, 0.67);
         }
-        .iconfirm__container{
+        .iconfirm__bg--hidden{
+            opacity: 0;
+        }
+        .iconfirm__table{
             position: relative;
             display: table;
             width: 100%;
@@ -35,7 +38,7 @@
             display: table-cell;
             vertical-align: middle;            
         }
-        .iconfirm__wrap{
+        .iconfirm__box{
             background: #fff;
             width: 500px;
             margin: auto;
@@ -67,7 +70,7 @@
         }
         .iconfirm__content{
         }
-        .iconfirm__wrap{
+        .iconfirm__box{
             box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
         }
         .iconfirm__close-icon{
@@ -131,18 +134,16 @@
             }
         }
 
-        .iconfirm__wrap.hilight-shake{
+        .iconfirm__box.hilight-shake{
             animation: shake 0.82s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
             transform: translate3d(0, 0, 0);
         }
 
-        .iconfirm__wrap--sacle{
+        .iconfirm__box--sacle{
             opacity: 0;
             transform: scale(.5);
         }
-        .modal__bg--hidden{
-            opacity: 0;
-        }
+
     </style>
 
     <title></title>
@@ -229,8 +230,7 @@
                 <dd> 
                     <input class="input" type="text" placeholder="请输入手机验证码">
                     <button class="unbind-bank-card__btn unbind-bank-card__btn--getcode">
-                        <img class="unbind-bank-card__loading" src="https://www.icaifu.com/images/p2p/loading.gif" alt="加载中">
-                        获取验证码</button>
+                        <img class="unbind-bank-card__loading" src="https://www.icaifu.com/images/p2p/loading.gif" alt="加载中">获取验证码</button>
                 </dd>
             </dl>
 
@@ -333,6 +333,7 @@
         $.idialog({
             title: '解绑银行卡',
             content: $('#J_unbind_bank_card_template').html(),
+            backgroundDismiss: false,
             onOpen: function(){
                 var that              = this;
                 var $phone            = this.$content.find('#J_bind_bank_card_phone');

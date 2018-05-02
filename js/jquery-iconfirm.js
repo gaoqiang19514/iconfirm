@@ -141,14 +141,14 @@ var proxy = function (options) {
 
 proxy.lastClicked = false;
 
-$(document).on('mousedown', 'button, a', function () {
+$(document).on('mousedown.proxy', 'button, a', function () {
     proxy.lastClicked = $(this);
 });
 
 proxy.defaults = {
     title:              '',
     content:            '',
-    container:          'body',
+    target:          'body',
     animationSpeed:     400,
     slogan:             false,
     backgroundDismiss:  true,
@@ -170,31 +170,30 @@ proxy.defaults = {
 
 
 function Iconfirm(options) {
-    var template = '<div class="iconfirm">' +
-            '<div class="iconfirm__bg modal__bg--hidden"></div>' +
-            '<div class="iconfirm__container">' +
-                '<div class="iconfirm__cell">' +
-                '<div class="iconfirm__animation-starting-position">' +
-                        '<div class="iconfirm__move-container">' +
-                            '<div class="iconfirm__wrap iconfirm__wrap--sacle">' +
-                                '<div class="iconfirm__head">' +
-                                    '<div class="iconfirm__close-icon">×</div>' +
-                                    '<div class="iconfirm__slogan"></div>' +
-                                    '<div class="iconfirm__title"></div>' +
-                                '</div>' +
-                                '<div class="iconfirm__main">' +
-                                    '<div class="iconfirm__content"></div>' +
-                                '</div>' +
-                                '<div class="iconfirm__foot">' +
-                                    '<div class="iconfirm__buttons">' +
+    var template =  '<div class="iconfirm">' +
+                        '<div class="iconfirm__bg iconfirm__bg--hidden"></div>' +
+                        '<div class="iconfirm__table">' +
+                            '<div class="iconfirm__cell">' +
+                                '<div class="iconfirm__animation">' +
+                                    '<div class="iconfirm__move">' +
+                                        '<div class="iconfirm__box iconfirm__box--sacle">' +
+                                            '<div class="iconfirm__head">' +
+                                                '<div class="iconfirm__close-icon">×</div>' +
+                                                '<div class="iconfirm__slogan"></div>' +
+                                                '<div class="iconfirm__title"></div>' +
+                                            '</div>' +
+                                            '<div class="iconfirm__main">' +
+                                                '<div class="iconfirm__content"></div>' +
+                                            '</div>' +
+                                            '<div class="iconfirm__foot">' +
+                                                '<div class="iconfirm__buttons"></div>' +
+                                            '</div>' +
+                                        '</div>' +
+                                    '</div>' +
                                 '</div>' +
                             '</div>' +
                         '</div>' +
-                    '</div>' +
-                '</div>' +
-            '</div>' +
-            '</div>' +
-        '</div>';
+                    '</div>';
 
     this.options   = options;
     this.$template = $(template);
@@ -211,33 +210,30 @@ Iconfirm.prototype.init = function () {
 };
 
 Iconfirm.prototype.buildUI = function () {
-    var self            = this;
-    var $template       = this.$template;
+    var self              = this;
+    var $template         = this.$template;
+    
+    this.$win       = $(window);
+    this.$confirm   = $template.appendTo(this.target);
+    this.$bg        = $template.find('.iconfirm__bg');
+    this.$table     = $template.find('.iconfirm__table');
+    this.$cell      = $template.find('.iconfirm__cell');
+    this.$box       = $template.find('.iconfirm__box');
+    this.$title     = $template.find('.iconfirm__title');
+    this.$content   = $template.find('.iconfirm__content');
+    this.$head      = $template.find('.iconfirm__head');
+    this.$slogan    = $template.find('.iconfirm__slogan');
+    this.$buttons   = $template.find('.iconfirm__buttons');
+    this.$closeIcon = $template.find('.iconfirm__close-icon');
+    this.$move      = $template.find('.iconfirm__move');
+    this.$animation = $template.find('.iconfirm__animation');
+    
+    this.contentReady = $.Deferred();
 
-    this.$bg            = $template.find('.iconfirm__bg');
-    this.$title         = $template.find('.iconfirm__title');
-    this.$cell          = $template.find('.iconfirm__cell');
-    this.$content       = $template.find('.iconfirm__content');
-    this.$wrap          = $template.find('.iconfirm__wrap');
-    this.$head          = $template.find('.iconfirm__head');
-    this.$slogan        = $template.find('.iconfirm__slogan');
-    this.$buttons       = $template.find('.iconfirm__buttons');
-    this.$closeIcon     = $template.find('.iconfirm__close-icon');
-    this.$container     = $template.find('.iconfirm__container');
-    this.$moveContainer = $template.find('.iconfirm__move-container');
-
-    this.$startingPostion = $template.find('.iconfirm__animation-starting-position');
-
-    this.$confirm       = $template.appendTo(this.options.container);
-
-    this.$win           = $(window);
-
-    this.contentReady   = $.Deferred();
-
-    this.setStartingPosition();
+    this.setAnimationPosition();
 
     if (this.width) {
-        this.$wrap.css('width', this.width);
+        this.$box.css('width', this.width);
     }
 
     this.setTitle();
@@ -249,7 +245,7 @@ Iconfirm.prototype.buildUI = function () {
     // 这里的副作用解决了slogan弹层动画起始位置错误的问题
     this.fixScrollbar();
     
-    if (this.options.isAjax) {
+    if (this.isAjax) {
         this.showLoading();
     }
 
@@ -261,10 +257,10 @@ Iconfirm.prototype.buildUI = function () {
         }
     });
 
-    // 执行动画效果
-    this.$bg.css(this.setAnimationCSS(this.options.animationSpeed, 1));
-    this.$wrap.css(this.setAnimationCSS(this.options.animationSpeed, 1));
-    this.$startingPostion.css(this.setAnimationCSS(this.options.animationSpeed, 1));
+    // 执行动画效果预设
+    this.$bg.css(this.setAnimationCSS(this.animationSpeed, 1));
+    this.$box.css(this.setAnimationCSS(this.animationSpeed, 1));
+    this.$animation.css(this.setAnimationCSS(this.animationSpeed, 1));
 };
 
 Iconfirm.prototype.measureScrollbarWidth = function(){
@@ -289,7 +285,7 @@ Iconfirm.prototype.scrollTop = function(){
     }
 };
 
-Iconfirm.prototype.setStartingPosition = function(){
+Iconfirm.prototype.setAnimationPosition = function(){
     var el = false;
     if(this.animateFromElement && proxy.lastClicked){
         el = proxy.lastClicked;
@@ -299,8 +295,8 @@ Iconfirm.prototype.setStartingPosition = function(){
     if(!el.length){return false;}
 
     var offset = el.offset();
-    var left   = (el.outerWidth() - this.$wrap.outerWidth()) / 2;
-    var top    = (el.outerHeight() - this.$wrap.outerHeight()) / 2;
+    var left   = (el.outerWidth() - this.$box.outerWidth()) / 2;
+    var top    = (el.outerHeight() - this.$box.outerHeight()) / 2;
 
     left       = offset.left + left;
     top        = offset.top - this.scrollTop() + top;
@@ -308,13 +304,13 @@ Iconfirm.prototype.setStartingPosition = function(){
     var winW = this.$win.width() / 2;
     var winH = this.$win.height() / 2;
 
-    var targetW = winW - (this.$wrap.outerWidth() / 2);
-    var targetH = winH - (this.$wrap.outerHeight() / 2);
+    var targetW = winW - (this.$box.outerWidth() / 2);
+    var targetH = winH - (this.$box.outerHeight() / 2);
     
     var sourceLeft = left - targetW;
     var sourceTop = top - targetH;
 
-    this.$startingPostion.css('transform', 'translate(' + sourceLeft + 'px, ' + sourceTop + 'px)');
+    this.$animation.css('transform', 'translate(' + sourceLeft + 'px, ' + sourceTop + 'px)');
 };
 
 Iconfirm.prototype.shake = function () {
@@ -324,11 +320,11 @@ Iconfirm.prototype.shake = function () {
         return;
     }
 
-    that.$wrap.addClass('hilight-shake');
+    that.$box.addClass('hilight-shake');
     this._hilightAnimating = true;
     setTimeout(function () {
         that._hilightAnimating = false;
-        that.$wrap.removeClass('hilight-shake');
+        that.$box.removeClass('hilight-shake');
     }, 820);
 };
 
@@ -336,9 +332,9 @@ Iconfirm.prototype.bindEvent = function () {
     var that = this;
 
     var $target;
-    that.$container.on('click', function (e) {
+    that.$table.on('click', function (e) {
         $target = $(e.target);
-        if (!$target.closest('.iconfirm__wrap').length) {
+        if (!$target.closest('.iconfirm__box').length) {
             if (that.backgroundDismiss) {
                 that.close();
             } else {
@@ -428,10 +424,10 @@ Iconfirm.prototype.setButtonts = function () {
 
 Iconfirm.prototype.fixScrollbar = function(){
     var winH       = this.$win.height();
-    var containerH = this.$container.height()
+    var tableH = this.$table.height()
 
     // 如果容器高度大于window，说明出现了滚动条 所以给bg的right减去获取的滚动条宽度
-    if(containerH - winH){
+    if(tableH - winH){
         var scrollbarW = this.measureScrollbarWidth();
         this.$bg.css("right", scrollbarW);
     }
@@ -440,26 +436,26 @@ Iconfirm.prototype.fixScrollbar = function(){
 Iconfirm.prototype.open = function () {
     var that = this;
 
-    that.$wrap.removeClass('iconfirm__wrap--sacle');
-    that.$bg.removeClass('modal__bg--hidden');
-    that.$startingPostion.css('transform', 'translate(' + 0 + 'px, ' + 0 + 'px)');
+    that.$box.removeClass('iconfirm__box--sacle');
+    that.$bg.removeClass('iconfirm__bg--hidden');
+    that.$animation.css('transform', 'translate(' + 0 + 'px, ' + 0 + 'px)');
 
     setTimeout(function () {
         if (typeof that.onOpen === 'function') {
             that.onOpen();
         }
-    }, that.options.animationSpeed);
+    }, that.animationSpeed);
 };
 
 Iconfirm.prototype.close = function () {
     var that = this;
 
-    this.$wrap.addClass('iconfirm__wrap--sacle');
-    this.$bg.addClass('modal__bg--hidden');
+    this.$box.addClass('iconfirm__box--sacle');
+    this.$bg.addClass('iconfirm__bg--hidden');
 
     setTimeout(function () {
         that.$confirm.remove();
-    }, that.options.animationSpeed);
+    }, that.animationSpeed);
 };
 
 // ----------------------------------------------------------------------------------------
@@ -480,7 +476,7 @@ Iconfirm.prototype.resetDrag = function () {
         y: 0
     };
 
-    this.$moveContainer.css({
+    this.$move.css({
         transform: 'translate(' + this.currentPos.x + 'px, ' + this.currentPos.y + 'px)'
     });
 };
@@ -535,17 +531,17 @@ Iconfirm.prototype.setDraggable = function () {
 };
 
 Iconfirm.prototype.setDrag = function () {
-    var $box = this.$wrap, $container = this.$container, $window = this.$win;
+    var $box = this.$box, $table = this.$table, $window = this.$win;
 
     var winW       = $window.width();
     var winH       = $window.height();
     var boxW       = $box.width();
     var boxH       = $box.height();
-    var containerH = $container.height()
+    var tableH = $table.height()
 
     var minLeft    = (winW - boxW) / 2 - this.dragWindowGap;
     var minTop     = (winH - boxH) / 2 - this.dragWindowGap;
-    var scrollTop  = (containerH - winH) / 2;
+    var scrollTop  = (tableH - winH) / 2;
 
     if(this.currentPos.x + minLeft < 0){
         this.currentPos.x = -minLeft;
@@ -562,7 +558,7 @@ Iconfirm.prototype.setDrag = function () {
     this.currentPos.x = parseInt(this.currentPos.x);
     this.currentPos.y = parseInt( this.currentPos.y);
 
-    this.$moveContainer.css({
+    this.$move.css({
         transform: 'translate(' + this.currentPos.x + 'px, ' + this.currentPos.y + 'px)'
     });
 };
