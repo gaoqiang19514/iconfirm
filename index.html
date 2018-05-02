@@ -6,147 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <meta name="description" content="">
     <meta name="keywords" content="">
-    
-    <style>
-        .iconfirm{
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            overflow-x: hidden;
-        }
-        .iconfirm__bg{
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: #000;
-            opacity: .4;
-            filter: alpha(opacity=40);  
-        }
-        .iconfirm__bg--hidden{
-            opacity: 0;
-        }
-        .iconfirm__table{
-            position: relative;
-            display: table;
-            width: 100%;
-            height: 100%;
-        }
-        .iconfirm__cell{
-            padding: 40px 0;
-            display: table-cell;
-            vertical-align: middle;            
-        }
-        .iconfirm__box{
-            background: #fff;
-            width: 500px;
-            margin: auto;
-        }
-        .iconfirm__head{
-            position: relative;
-            padding: 30px 0 0 0;
-        }
-        .iconfirm__head:active{
-            cursor: move;
-        }
-        .iconfirm__slogan{
-            text-align: center;
-            padding-bottom: 20px;
-        }
-        .iconfirm__slogan img{
-            display: block;
-            margin: auto;
-            max-width: 100%;
-        }
-        .iconfirm__title{
-            padding: 0 20px;
-            font-size: 16px;
-            font-weight: bold;
-            text-align: center;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-        .iconfirm__content{
-        }
-        .iconfirm__box{
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-        }
-        .iconfirm__close-icon{
-            cursor: pointer;
-            position: absolute;
-            right: 10px;
-            top: 10px;
-            width: 20px;
-            line-height: 20px;
-            font-size: 24px;
-            text-align: center;
-            opacity: .6;
-        }
-        .iconfirm__close-icon:hover{
-            opacity: 1;
-        }
-        .iconfirm__main{
-            padding: 20px;
-        }
-        .iconfirm__buttons--multipe {
-            font-size: 0;
-        }
-        .iconfirm__buttons--multipe button{
-            width: 50%;
-        }
-        .iconfirm__btn{
-            color: #fff;
-            outline: none;
-            cursor: pointer;
-            letter-spacing: .2em;
-            width: 100%;
-            border: 0;
-            font-size: 16px;
-            font-weight: bold;
-            padding: 0;
-            line-height: 50px;
-            background: #eb5d5b;
-
-        }
-        @keyframes shake {
-            10%,
-            90% {
-                -webkit-transform: translate3d(-2px, 0, 0);
-                        transform: translate3d(-2px, 0, 0);
-            }
-            20%,
-            80% {
-                -webkit-transform: translate3d(4px, 0, 0);
-                        transform: translate3d(4px, 0, 0);
-            }
-            30%,
-            50%,
-            70% {
-                -webkit-transform: translate3d(-8px, 0, 0);
-                        transform: translate3d(-8px, 0, 0);
-            }
-            40%,
-            60% {
-                -webkit-transform: translate3d(8px, 0, 0);
-                        transform: translate3d(8px, 0, 0);
-            }
-        }
-
-        .iconfirm__box.hilight-shake{
-            animation: shake 0.82s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
-            transform: translate3d(0, 0, 0);
-        }
-
-        .iconfirm__box--sacle{
-            opacity: 0;
-            transform: scale(.5);
-        }
-
-    </style>
+    <link rel="stylesheet" href="./css/iconfirm.css">
     <title></title>
 </head>
 <body>
@@ -161,37 +21,43 @@
     <!-- 解绑银行卡 -->
     <script id="J_unbind_bank_card_template" type="text/x-handlebars-template">
         <style>
-            .unbind-bank-card__box{
+            .unbind-bank-card__box {
                 margin: 0 0 10px 0;
             }
-            .unbind-bank-card__box dt{
+
+            .unbind-bank-card__box dt {
                 float: left;
             }
-            .unbind-bank-card__box dd{
+
+            .unbind-bank-card__box dd {
                 margin-left: 80px;
             }
 
-            .unbind-bank-card .input{
+            .unbind-bank-card .input {
                 outline: none;
                 font-size: 16px;
                 width: 150px;
                 padding: 12px 10px;
                 border: 1px solid #eaeaea;
             }
-            .unbind-bank-card__message{
+
+            .unbind-bank-card__message {
                 font-size: 14px;
                 line-height: 2;
-                color: #eb5d5b; 
+                color: #eb5d5b;
             }
-            .unbind-bank-card__tips{
+
+            .unbind-bank-card__tips {
                 font-size: 14px;
                 color: #888;
                 margin: .5em 0 1em 0;
             }
-            .unbind-bank-card__btn-wrap{
+
+            .unbind-bank-card__btn-wrap {
                 text-align: center;
             }
-            .unbind-bank-card__btn{
+
+            .unbind-bank-card__btn {
                 cursor: pointer;
                 padding: 0 80px;
                 border: 0;
@@ -203,19 +69,22 @@
                 line-height: 44px;
                 background: #eb5d5b;
             }
-            .unbind-bank-card__btn--loading{
+
+            .unbind-bank-card__btn--loading {
                 cursor: default;
                 background: #ccc;
             }
-            .unbind-bank-card__btn--loading img{
+
+            .unbind-bank-card__btn--loading img {
                 display: inline;
             }
-            .unbind-bank-card__btn--getcode{
+
+            .unbind-bank-card__btn--getcode {
                 padding: 0 20px;
             }
-            .unbind-bank-card__loading{
-                display: none;
 
+            .unbind-bank-card__loading {
+                display: none;
                 vertical-align: middle;
                 width: 30px;
                 height: 30px;
@@ -253,22 +122,24 @@
     <!-- 提现说明 -->
     <script id="J_withdraw_template" type="text/x-handlebars-template">
         <style>
-            .withdraw-explain{
+            .withdraw-explain {
                 color: #333;
                 font-size: 14px;
                 line-height: 1.7;
             }
-            .withdraw-explain ol{
+
+            .withdraw-explain ol {
                 margin: 0;
                 padding: 0 0 0 1.5em;
             }
-            .withdraw-explain table{
+
+            .withdraw-explain table {
                 border-collapse: collapse;
                 width: 100%;
                 margin: 10px 0;
             }
-            .withdraw-explain th,
-            .withdraw-explain td{
+
+            .withdraw-explain th, .withdraw-explain td {
                 padding: 10px;
                 vertical-align: middle;
                 border: 1px solid #898996;
