@@ -12,6 +12,28 @@ var isObject = function(obj){
     return Object.prototype.toString.call(obj) === '[object Object]';
 };
 
+var supportCss3 = function(style){
+    var prefix = ['webkit', 'Moz', 'ms', 'o'],
+        i,
+        humpString = [],
+        htmlStyle = document.documentElement.style,
+        _toHumb = function (string) {
+            return string.replace(/-(\w)/g, function ($0, $1) {
+                return $1.toUpperCase();
+            });
+        };
+
+    for (i in prefix)
+        humpString.push(_toHumb(prefix[i] + '-' + style));
+
+    humpString.push(_toHumb(style));
+
+    for (i in humpString)
+        if (humpString[i] in htmlStyle) return true;
+
+    return false;
+}
+
 // 参数包装 允许用户使用字符串参数调用和对象参数调用 但是字符串参数需要进行包装
 // 并且这种参数包装逻辑不应该交给Icofirm 所以要抽取出来
 var buildOptions = function (options, option2) {
@@ -30,7 +52,7 @@ var buildOptions = function (options, option2) {
 };
 
 var getObjectKeys = function (buttons) {
-    if (!isObject(buttons)) {
+    if (typeof buttons === 'undefined') {
         return [];
     }
 
@@ -63,7 +85,7 @@ var getTypeButtons = function (options, type) {
         case 'confirm':
             var buttons = {};
 
-            if(isObject(options['buttons'])){
+            if(typeof options['buttons'] !== 'undefined'){
                 buttons = options['buttons'];
             }
 
@@ -74,11 +96,11 @@ var getTypeButtons = function (options, type) {
             return buttons;
         case 'alert':
             var buttons = {};
-
-            if(isObject(options['buttons'])){
+            
+            if(typeof options['buttons'] !== 'undefined'){
                 buttons = options['buttons'];
             }
-    
+
             if (getObjectKeys(buttons).length === 0 && (buttons !== false)) {
                 var defaultButtons = $.extend({}, proxy.defaults.defaultButtons);
                 var first = getObjectKeyOfIndex(defaultButtons, 0);
@@ -237,6 +259,10 @@ Iconfirm.prototype.buildUI = function () {
         this.$box.css('width', this.width);
     }
 
+    if(!supportCss3('animation')){
+        this.animationSpeed = 1;
+    }
+
     this.setTitle();
     this.setSlogan();
     this.setContent();
@@ -257,6 +283,7 @@ Iconfirm.prototype.buildUI = function () {
             // 同步处理内容
         }
     });
+
 
     // 执行动画效果预设
     this.$bg.css(this.setAnimationCSS(this.animationSpeed, 1));
@@ -285,7 +312,7 @@ Iconfirm.prototype.setButtonts = function () {
     var buttons_count = 0;
     var buttons       = this.buttons;
 
-    if (!isObject(buttons)) {
+    if (typeof buttons === 'undefined') {
         buttons = {};
     }
 
