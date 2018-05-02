@@ -218,18 +218,19 @@ Iconfirm.prototype.buildUI = function () {
     this.$bg        = $template.find('.iconfirm__bg');
     this.$table     = $template.find('.iconfirm__table');
     this.$cell      = $template.find('.iconfirm__cell');
-    this.$box       = $template.find('.iconfirm__box');
-    this.$title     = $template.find('.iconfirm__title');
-    this.$content   = $template.find('.iconfirm__content');
-    this.$head      = $template.find('.iconfirm__head');
-    this.$slogan    = $template.find('.iconfirm__slogan');
-    this.$buttons   = $template.find('.iconfirm__buttons');
-    this.$closeIcon = $template.find('.iconfirm__close-icon');
-    this.$move      = $template.find('.iconfirm__move');
     this.$animation = $template.find('.iconfirm__animation');
-    
+    this.$move      = $template.find('.iconfirm__move');
+    this.$box       = $template.find('.iconfirm__box');
+    this.$head      = $template.find('.iconfirm__head');
+    this.$title     = $template.find('.iconfirm__title');
+    this.$slogan    = $template.find('.iconfirm__slogan');
+    this.$closeIcon = $template.find('.iconfirm__close-icon');
+    this.$content   = $template.find('.iconfirm__content');
+    this.$buttons   = $template.find('.iconfirm__buttons');
+
     this.contentReady = $.Deferred();
 
+    // 设置动画起点
     this.setAnimationPosition();
 
     if (this.width) {
@@ -261,92 +262,6 @@ Iconfirm.prototype.buildUI = function () {
     this.$bg.css(this.setAnimationCSS(this.animationSpeed, 1));
     this.$box.css(this.setAnimationCSS(this.animationSpeed, 1));
     this.$animation.css(this.setAnimationCSS(this.animationSpeed, 1));
-};
-
-Iconfirm.prototype.measureScrollbarWidth = function(){
-    var $div = $('<div style="width: 100px; height: 100px; outline: 1px solid red; overflow: scroll;"><div></div></div>');
-    $('body').append($div);
-    var divW = $div.width();
-    var divInnerW = $div.find('div').width();
-
-    $div.remove();
-    return divW - divInnerW;
-};
-
-Iconfirm.prototype.scrollTop = function(){
-    if (typeof pageYOffset !== 'undefined') {
-        //most browsers except IE before #9
-        return pageYOffset;
-    } else {
-        var B = document.body; //IE 'quirks'
-        var D = document.documentElement; //IE with doctype
-        D = (D.clientHeight) ? D : B;
-        return D.scrollTop;
-    }
-};
-
-Iconfirm.prototype.setAnimationPosition = function(){
-    var el = false;
-    if(this.animateFromElement && proxy.lastClicked){
-        el = proxy.lastClicked;
-        proxy.lastClicked = false;
-    }
-
-    if(!el.length){return false;}
-
-    var offset = el.offset();
-    var left   = (el.outerWidth() - this.$box.outerWidth()) / 2;
-    var top    = (el.outerHeight() - this.$box.outerHeight()) / 2;
-
-    left       = offset.left + left;
-    top        = offset.top - this.scrollTop() + top;
-
-    var winW = this.$win.width() / 2;
-    var winH = this.$win.height() / 2;
-
-    var targetW = winW - (this.$box.outerWidth() / 2);
-    var targetH = winH - (this.$box.outerHeight() / 2);
-    
-    var sourceLeft = left - targetW;
-    var sourceTop = top - targetH;
-
-    this.$animation.css('transform', 'translate(' + sourceLeft + 'px, ' + sourceTop + 'px)');
-};
-
-Iconfirm.prototype.shake = function () {
-    var that = this;
-
-    if (that._hilightAnimating) {
-        return;
-    }
-
-    that.$box.addClass('hilight-shake');
-    this._hilightAnimating = true;
-    setTimeout(function () {
-        that._hilightAnimating = false;
-        that.$box.removeClass('hilight-shake');
-    }, 820);
-};
-
-Iconfirm.prototype.bindEvent = function () {    
-    var that = this;
-
-    var $target;
-    that.$table.on('click', function (e) {
-        $target = $(e.target);
-        if (!$target.closest('.iconfirm__box').length) {
-            if (that.backgroundDismiss) {
-                that.close();
-            } else {
-                that.shake();
-            }
-        }
-    });
-
-    that.$win.on('resize', function (e) {
-        that.resetDrag();
-    });
-
 };
 
 Iconfirm.prototype.setTitle = function () {
@@ -420,6 +335,92 @@ Iconfirm.prototype.setButtonts = function () {
     self.$closeIcon.on('click', function (e) {
         self.close();
     });
+};
+
+Iconfirm.prototype.measureScrollbarWidth = function(){
+    var $div = $('<div style="width: 100px; height: 100px; outline: 1px solid red; overflow: scroll;"><div></div></div>');
+    $('body').append($div);
+    var divW = $div.width();
+    var divInnerW = $div.find('div').width();
+
+    $div.remove();
+    return divW - divInnerW;
+};
+
+Iconfirm.prototype.scrollTop = function(){
+    if (typeof pageYOffset !== 'undefined') {
+        //most browsers except IE before #9
+        return pageYOffset;
+    } else {
+        var B = document.body; //IE 'quirks'
+        var D = document.documentElement; //IE with doctype
+        D = (D.clientHeight) ? D : B;
+        return D.scrollTop;
+    }
+};
+
+Iconfirm.prototype.setAnimationPosition = function(){
+    var el = false;
+    if(this.animateFromElement && proxy.lastClicked){
+        el = proxy.lastClicked;
+        proxy.lastClicked = false;
+    }
+
+    if(!el.length){return false;}
+
+    var offset = el.offset();
+    var left   = (el.outerWidth() - this.$box.outerWidth()) / 2;
+    var top    = (el.outerHeight() - this.$box.outerHeight()) / 2;
+
+    left       = offset.left + left;
+    top        = offset.top - this.scrollTop() + top;
+
+    var winW = this.$win.width() / 2;
+    var winH = this.$win.height() / 2;
+
+    var targetW = winW - (this.$box.outerWidth() / 2);
+    var targetH = winH - (this.$box.outerHeight() / 2);
+    
+    var sourceLeft = left - targetW;
+    var sourceTop = top - targetH;
+
+    this.$animation.css('transform', 'translate(' + sourceLeft + 'px, ' + sourceTop + 'px)');
+};
+
+Iconfirm.prototype.shake = function () {
+    var that = this;
+
+    if (that._hilightAnimating) {
+        return;
+    }
+
+    that.$box.addClass('hilight-shake');
+    that._hilightAnimating = true;
+    setTimeout(function () {
+        that._hilightAnimating = false;
+        that.$box.removeClass('hilight-shake');
+    }, 820);
+};
+
+Iconfirm.prototype.bindEvent = function () {    
+    var that = this;
+
+    var $target;
+    that.$table.on('click', function (e) {
+        $target = $(e.target);
+        if (!$target.closest('.iconfirm__box').length) {
+            if (that.backgroundDismiss) {
+                that.close();
+            } else {
+                that.shake();
+            }
+        }
+    });
+
+    that.$win.on('resize', function (e) {
+        that.resetDrag();
+    });
+
 };
 
 Iconfirm.prototype.fixScrollbar = function(){
