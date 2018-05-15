@@ -40,7 +40,10 @@
     margin: auto;
     background: #fff;
 }
-
+.iconfirm__loading{
+    display: none;
+    text-align: center;
+}
 .iconfirm__head {
     position: relative;
     padding: 30px 0 0 0;

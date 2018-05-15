@@ -193,53 +193,6 @@
                 <li>当月有投资或回款到期的用户可享受3次免费提现福利。</li>
                 <li>提现失败，这笔资金将被冻结，两个工作日左右人工处理，解冻资金，需用户再次发起提现。</li>
             </ol>
-            <ol>
-                <li>提现费用为********，不足************</li>
-                <li>单笔提现最低10元起。</li>
-                <li>
-                    提现金额和到账时间参考，具体到账时间以银行实际收款时间而定。
-                    <table>
-                        <tr>
-                            <th>单笔金额</th>
-                            <th>处理时间</th>
-                            <th>到账时间</th>
-                        </tr>
-                        <tr>
-                            <td>小于等于5万</td>
-                            <td>7×24 小时</td>
-                            <td>两小时内</td>
-                        </tr>
-                        <tr>
-                            <td rowspan="3">大于5万小于50万</td>
-                            <td>工作日00:10 到17:00</td>
-                            <td>实时到账</td>
-                        </tr>
-                        <tr>
-                            <td>工作日17:00 到00:00</td>
-                            <td>不受理</td>
-                        </tr>
-                        <tr>
-                            <td>双休日及法定节假日</td>
-                            <td>两小时内</td>
-                        </tr>
-                        <tr>
-                            <td rowspan="3">大于等于50万</td>
-                            <td>工作日00:10 到17:00</td>
-                            <td>实时到账</td>
-                        </tr>
-                        <tr>
-                            <td>工作日17:00 到00:00</td>
-                            <td>不受理</td>
-                        </tr>
-                        <tr>
-                            <td>双休日及法定节假日</td>
-                            <td>不受理</td>
-                        </tr>                
-                    </table>
-                </li>
-                <li>当月有投资或回款到期的用户可享受3次免费提现福利。</li>
-                <li>提现失败，这笔资金将被冻结，两个工作日左右人工处理，解冻资金，需用户再次发起提现。</li>
-            </ol>
         </div>
     </script>
 
@@ -397,10 +350,11 @@
     // 提现说明
     $('.example-6').on('click', function(e){
         $.idialog({
-            width: 800,
+            // width: 800,
             title: '提现说明',
             content: $('#J_withdraw_template').html(),
-            backgroundDismiss: true
+            backgroundDismiss: true,
+            loadData: 'data.json'
         });
     }).trigger('click');
 
