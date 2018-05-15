@@ -168,9 +168,10 @@ $(document).on('mousedown.proxy', 'button, a', function () {
 });
 
 proxy.defaults = {
+    putCloseIcon:       true,
     title:              '',
     content:            '',
-    target:          'body',
+    target:             'body',
     animationSpeed:     400,
     slogan:             false,
     backgroundDismiss:  true,
@@ -220,6 +221,8 @@ function Iconfirm(options) {
     this.options   = options;
     this.$template = $(template);
 
+    this.bodyOverflowCache = '';
+
     $.extend(this, options);
 
     this.init();
@@ -236,6 +239,7 @@ Iconfirm.prototype.buildUI = function () {
     var $template         = this.$template;
     
     this.$win       = $(window);
+    this.$body      = $('body');
     this.$confirm   = $template.appendTo(this.target);
     this.$bg        = $template.find('.iconfirm__bg');
     this.$table     = $template.find('.iconfirm__table');
@@ -268,6 +272,7 @@ Iconfirm.prototype.buildUI = function () {
     this.setContent();
     this.setButtonts();
     this.setDraggable();
+    this.hideBodyScrollBar();
 
     // 这里的副作用解决了slogan弹层动画起始位置错误的问题
     this.fixScrollbar();
@@ -358,10 +363,27 @@ Iconfirm.prototype.setButtonts = function () {
     }else if(buttons_count > 1){
         self.$buttons.addClass('iconfirm__buttons--multipe');
     }
+  
+    if(self.putCloseIcon){
+        self.$closeIcon.on('click', function (e) {
+            self.close();
+        });
+    }else{
+        self.$closeIcon.hide();
+    }
+};
 
-    self.$closeIcon.on('click', function (e) {
-        self.close();
-    });
+Iconfirm.prototype.hideBodyScrollBar = function () {
+    this.bodyOverflowCache = this.$body.css('overflow');
+    this.$body.css('overflow', 'hidden');
+};
+
+Iconfirm.prototype.releaseHideBodyScrollBar = function () {
+    if(this.bodyOverflowCache){
+        this.$body.css('overflow', this.bodyOverflowCache);
+    }else{
+        this.$body.css('overflow', '');
+    }
 };
 
 Iconfirm.prototype.measureScrollbarWidth = function(){
@@ -482,6 +504,7 @@ Iconfirm.prototype.close = function () {
     this.$bg.addClass('iconfirm__bg--hidden');
 
     setTimeout(function () {
+        that.releaseHideBodyScrollBar();
         that.$confirm.remove();
     }, that.animationSpeed);
 };
