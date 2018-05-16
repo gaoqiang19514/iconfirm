@@ -40,6 +40,9 @@
     margin: auto;
     background: #fff;
 }
+.iconfirm__box.loading .iconfirm__loading{
+    display: block;
+}
 .iconfirm__loading{
     display: none;
     text-align: center;

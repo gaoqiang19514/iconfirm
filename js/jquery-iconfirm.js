@@ -168,7 +168,6 @@ $(document).on('mousedown.proxy', 'button, a', function () {
 });
 
 proxy.defaults = {
-    loadData:           false,
     putCloseIcon:       true,
     title:              '',
     content:            '',
@@ -208,8 +207,8 @@ function Iconfirm(options) {
                                             '</div>' +
                                             '<div class="iconfirm__main">' +
                                                 '<div class="iconfirm__content">' +
-                                                '<div class="iconfirm__loading"><img src="./images/loading.gif" /></div>' +
                                                 '</div>' +
+                                                '<div class="iconfirm__loading"><img src="./images/loading.gif" /></div>' +
                                             '</div>' +
                                             '<div class="iconfirm__foot">' +
                                                 '<div class="iconfirm__buttons"></div>' +
@@ -225,6 +224,8 @@ function Iconfirm(options) {
     this.$template = $(template);
 
     this.bodyOverflowCache = '';
+    this.isAjax = false;
+    this.isAjaxLoading = false;
 
     $.extend(this, options);
 
@@ -275,7 +276,7 @@ Iconfirm.prototype.buildUI = function () {
     this.setSlogan();
     this.setButtonts();
     this.setDraggable();
-    // this.parseContent();
+    this.parseContent();
     this.hideBodyScrollBar();
 
     // 这里的副作用解决了slogan弹层动画起始位置错误的问题
@@ -288,8 +289,11 @@ Iconfirm.prototype.buildUI = function () {
     $.when(this.contentReady).then(function () {
         if (self.isAjaxLoading) {
             // 异步处理内容
+            self.isAjaxLoading = false;
+            self.hideLoading();
         } else {
             // 同步处理内容
+            self.setContent();
         }
     });
 
@@ -308,12 +312,6 @@ Iconfirm.prototype.parseContent = function () {
     var that = this;
     var e = '&nbsp;';
 
-    // 情况1 conent是个函数 直接执行这个函数 然后对函数的返回值进行判断
-        // 1 返回值为字符串 ==》 赋值给content
-        // 2 返回值是一个对象 并且这个对象有always属性还是个函数 说明这是个promise
-        //   这种情况下我们将this.isAjax 和 isAjaxLoading 都置为true 然后给监听这个promise被执行 再给content一个空格占位
-        //   被执行时将结果赋值给this.ajaxResponse 然后执行掉that._contentReady 让主流程的promise得到数据
-        // 3 如果以上都不是给content一个空字符吧
     if(typeof this.content === 'function'){
         var res = this.content.apply(this);
 
@@ -325,15 +323,7 @@ Iconfirm.prototype.parseContent = function () {
             this.isAjaxLoading = true;
 
             res.always(function(data, status, xhr){
-                that.ajaxResponse = {
-                    data: data,
-                    status: status,
-                    xhr: xhr
-                };
-                that._contentReady.resolve(data, status, xhr);
-                if(typeof that.contentLoaded === 'function'){
-                    that.contentLoaded(data, status, xhr);
-                }
+                that.contentReady.resolve(data, status, xhr);
             });
             this.content = e;
         }else{
@@ -341,34 +331,17 @@ Iconfirm.prototype.parseContent = function () {
         }
     }
 
-    // 情况2 content是个字符串 并且是以url开头
-    if(typeof this.content === 'string' && this.content.substr(0, 4).toLowerCase() === 'url:'){
-        this.isAjax = true;
-        this.isAjaxLoading = true;
-        var u = this.content.substring(4, this.content.length);
-        $.get(u).done(function(html){
-            that.contentParsed.html(html);
-        }).always(function(data, status, xhr){
-            that.ajaxResponse = {
-                data: data,
-                status: status,
-                xhr: xhr
-            };
-            that._contentReady.resolve(data, status, xhr);
-            if(typeof that.contentLoaded === 'function')
-                that.contentLoaded(data, status, xhr);
-        });
-    }
-
-    // 情况3 content为假值
-    if(!this.content){
-        this.content = e;
-    }
-
     if(!this.isAjax){
-        this.contentParsed.html(this.content);
-        this.setContent();
-        that._contentReady.resolve();
+        that.contentReady.resolve();
+    }
+};
+
+
+Iconfirm.prototype.setContent = function (_content) {
+    if(_content){
+        this.$content.html(_content);    
+    }else{
+        this.$content.html(this.content);
     }
 };
 
@@ -380,9 +353,6 @@ Iconfirm.prototype.setSlogan = function () {
     }
 };
 
-Iconfirm.prototype.setContent = function () {
-    this.$content.html(this.content);
-};
 
 Iconfirm.prototype.setButtonts = function () {
     var self          = this;
@@ -688,9 +658,13 @@ Iconfirm.prototype.setDrag = function () {
 
 // ----------------------------------------------------------------------------------------
 
-Iconfirm.prototype.showLoading = function () {};
+Iconfirm.prototype.showLoading = function () {
+    this.$box.addClass('loading');
+};
 
-Iconfirm.prototype.hideLoading = function () {};
+Iconfirm.prototype.hideLoading = function () {
+    this.$box.removeClass('loading');
+};
 
 Iconfirm.prototype.setAnimationCSS = function (speed) {
     var bounce = 1;

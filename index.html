@@ -352,9 +352,21 @@
         $.idialog({
             // width: 800,
             title: '提现说明',
-            content: $('#J_withdraw_template').html(),
-            backgroundDismiss: true,
-            loadData: 'data.json'
+            content: '我是弹层content',
+            content: function(){
+
+                return 'haha';
+                var self = this;
+                return $.ajax({
+                    type: "GET",
+                    url: "data.json",
+                    success: function (response) {
+                        // 在这里将内容插入content里面去
+                        self.setContent('<h1>ajax data</h1>');
+                    }
+                });
+            },
+            backgroundDismiss: true
         });
     }).trigger('click');
 
