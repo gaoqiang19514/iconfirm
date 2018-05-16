@@ -262,7 +262,7 @@ Iconfirm.prototype.buildUI = function () {
     this.contentReady = $.Deferred();
 
     // 设置动画起点
-    this.setAnimationPosition();
+    // this.setAnimationPosition();
 
     if (this.width) {
         this.$box.css('width', this.width);
@@ -272,15 +272,16 @@ Iconfirm.prototype.buildUI = function () {
         this.animationSpeed = 1;
     }
 
+
     this.setTitle();
     this.setSlogan();
     this.setButtonts();
     this.setDraggable();
     this.parseContent();
-    this.hideBodyScrollBar();
 
     // 这里的副作用解决了slogan弹层动画起始位置错误的问题
     this.fixScrollbar();
+    this.hideBodyScrollBar();
     
     if (this.isAjax) {
         this.showLoading();
@@ -295,6 +296,7 @@ Iconfirm.prototype.buildUI = function () {
             // 同步处理内容
             self.setContent();
         }
+        
     });
 
 
@@ -417,7 +419,7 @@ Iconfirm.prototype.setButtonts = function () {
 
 Iconfirm.prototype.hideBodyScrollBar = function () {
     this.bodyOverflowCache = this.$body.css('overflow');
-    this.$body.css('overflow', 'hidden');
+    this.$body.css('overflow-y', 'hidden');
 };
 
 Iconfirm.prototype.releaseHideBodyScrollBar = function () {
@@ -514,15 +516,18 @@ Iconfirm.prototype.bindEvent = function () {
 
 };
 
+
+Iconfirm.prototype.undoScrollbar = function(){
+    $('body').css("padding-right", 0);
+};
+
 Iconfirm.prototype.fixScrollbar = function(){
     var winH       = this.$win.height();
     var tableH = this.$table.height()
 
     // 如果容器高度大于window，说明出现了滚动条 所以给bg的right减去获取的滚动条宽度
-    if(tableH - winH){
         var scrollbarW = this.measureScrollbarWidth();
-        this.$bg.css("right", scrollbarW);
-    }
+        $('body').css("padding-right", scrollbarW);
 };
 
 Iconfirm.prototype.open = function () {
@@ -533,6 +538,7 @@ Iconfirm.prototype.open = function () {
     that.$animation.css('transform', 'translate(' + 0 + 'px, ' + 0 + 'px)');
 
     setTimeout(function () {
+        
         if (typeof that.onOpen === 'function') {
             that.onOpen();
         }
@@ -545,9 +551,14 @@ Iconfirm.prototype.close = function () {
     this.$box.addClass('iconfirm__box--sacle');
     this.$bg.addClass('iconfirm__bg--hidden');
 
+    that.undoScrollbar();
+    that.releaseHideBodyScrollBar();
+
+
     setTimeout(function () {
-        that.releaseHideBodyScrollBar();
+        
         that.$confirm.remove();
+        
     }, that.animationSpeed);
 };
 

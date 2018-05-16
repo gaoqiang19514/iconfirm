@@ -9,7 +9,10 @@
     <link rel="stylesheet" href="./css/iconfirm.css">
     <title></title>
 </head>
-<body style="height: 2000px; padding-top: 30%;">
+<body style="height: 2000px;">
+
+
+    <div style="padding-top: 30%;">
 
     <button class="example-1">解绑银行卡 1</button>
     <button class="example-2">提现 2</button>
@@ -17,6 +20,7 @@
     <button class="example-4">激活存管账户 4</button>
     <button class="example-5">开通存管账户 5</button>
     <button class="example-6">提现说明 6</button>
+</div>
     
     <!-- 解绑银行卡 -->
     <script id="J_unbind_bank_card_template" type="text/x-handlebars-template">
@@ -352,23 +356,11 @@
         $.idialog({
             // width: 800,
             title: '提现说明',
-            content: '我是弹层content',
-            content: function(){
+            content: $('#J_withdraw_template').html(),
 
-                return 'haha';
-                var self = this;
-                return $.ajax({
-                    type: "GET",
-                    url: "data.json",
-                    success: function (response) {
-                        // 在这里将内容插入content里面去
-                        self.setContent('<h1>ajax data</h1>');
-                    }
-                });
-            },
             backgroundDismiss: true
         });
-    }).trigger('click');
+    });
 
 </script>
 </body>
