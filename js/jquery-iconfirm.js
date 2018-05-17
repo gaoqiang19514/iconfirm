@@ -226,6 +226,7 @@ function Iconfirm(options) {
     this.bodyOverflowCache = '';
     this.isAjax = false;
     this.isAjaxLoading = false;
+    this.browserScrollbarWidth = 0;
 
     $.extend(this, options);
 
@@ -262,7 +263,7 @@ Iconfirm.prototype.buildUI = function () {
     this.contentReady = $.Deferred();
 
     // 设置动画起点
-    // this.setAnimationPosition();
+    this.setAnimationPosition();
 
     if (this.width) {
         this.$box.css('width', this.width);
@@ -271,7 +272,6 @@ Iconfirm.prototype.buildUI = function () {
     if(!supportCss3('animation')){
         this.animationSpeed = 1;
     }
-
 
     this.setTitle();
     this.setSlogan();
@@ -513,21 +513,26 @@ Iconfirm.prototype.bindEvent = function () {
     that.$win.on('resize', function (e) {
         that.resetDrag();
     });
-
 };
 
-
 Iconfirm.prototype.undoScrollbar = function(){
-    $('body').css("padding-right", 0);
+    if(this.cacheBodyPaddingRight){
+        $('body').css("padding-right", this.cacheBodyPaddingRight);
+    }else{
+        $('body').css("padding-right", 0);
+    }
 };
 
 Iconfirm.prototype.fixScrollbar = function(){
-    var winH       = this.$win.height();
-    var tableH = this.$table.height()
+    var winH             = this.$win.height();
+    var bodyScrollHeight = this.$body[0].scrollHeight;
 
-    // 如果容器高度大于window，说明出现了滚动条 所以给bg的right减去获取的滚动条宽度
+    this.cacheBodyPaddingRight = this.$body.css('padding-right');
+
+    if(bodyScrollHeight > winH){
         var scrollbarW = this.measureScrollbarWidth();
-        $('body').css("padding-right", scrollbarW);
+        this.$body.css("padding-right", scrollbarW);
+    }
 };
 
 Iconfirm.prototype.open = function () {
@@ -552,13 +557,10 @@ Iconfirm.prototype.close = function () {
     this.$bg.addClass('iconfirm__bg--hidden');
 
     that.undoScrollbar();
-    that.releaseHideBodyScrollBar();
-
 
     setTimeout(function () {
-        
+        that.releaseHideBodyScrollBar();
         that.$confirm.remove();
-        
     }, that.animationSpeed);
 };
 
