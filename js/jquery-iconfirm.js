@@ -191,6 +191,7 @@ proxy.defaults = {
     onOpen: function () {}
 };
 
+Iconfirm.instanceCount = 0;
 
 function Iconfirm(options) {
     var template =  '<div class="iconfirm">' +
@@ -227,6 +228,7 @@ function Iconfirm(options) {
     this.isAjax = false;
     this.isAjaxLoading = false;
     this.browserScrollbarWidth = 0;
+    Iconfirm.instanceCount++;
 
     $.extend(this, options);
 
@@ -423,6 +425,10 @@ Iconfirm.prototype.hideBodyScrollBar = function () {
 };
 
 Iconfirm.prototype.releaseHideBodyScrollBar = function () {
+    if(Iconfirm.instanceCount > 0){
+        return;
+    }
+
     if(this.bodyOverflowCache){
         this.$body.css('overflow', this.bodyOverflowCache);
     }else{
@@ -557,6 +563,7 @@ Iconfirm.prototype.close = function () {
     this.$bg.addClass('iconfirm__bg--hidden');
 
     that.undoScrollbar();
+    Iconfirm.instanceCount--;
 
     setTimeout(function () {
         that.releaseHideBodyScrollBar();
