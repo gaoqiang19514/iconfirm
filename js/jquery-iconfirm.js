@@ -209,7 +209,6 @@ function Iconfirm(options) {
                                             '<div class="iconfirm__main">' +
                                                 '<div class="iconfirm__content">' +
                                                 '</div>' +
-                                                '<div class="iconfirm__loading"><img src="./images/loading.gif" /></div>' +
                                             '</div>' +
                                             '<div class="iconfirm__foot">' +
                                                 '<div class="iconfirm__buttons"></div>' +
